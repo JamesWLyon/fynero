@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import Navbar from "../ui/NavBar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,19 +17,18 @@ export const metadata: Metadata = {
   description: "Made by James Lyon",
 };
 
-export default function RootLayout({
+export default function PagesLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body>
+    <div className="flex min-h-screen">
+      <Navbar />
+
+      <main className="flex-1 p-6 bg-[linear-gradient(to_right,var(--third-clr),var(--forth-clr))]">
         {children}
-      </body>
-    </html>
+      </main>
+    </div>
   );
 }
