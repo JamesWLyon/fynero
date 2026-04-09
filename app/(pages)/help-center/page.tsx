@@ -1,5 +1,6 @@
-export default function Bills() {
+export default function HelpCenter() {
     return (
-        <></>
+        <>
+        </>
     );
 }
