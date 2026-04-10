@@ -1,4 +1,14 @@
-import { House, DollarSign, PiggyBank, ScrollText, Settings, Headset, ArrowRightLeft } from 'lucide-react';
+import {
+    House, 
+    DollarSign, 
+    PiggyBank, 
+    ScrollText, 
+    Settings, 
+    Headset, 
+    UserRound, 
+    ChartNoAxesColumn, 
+    ArrowRightLeft 
+} from 'lucide-react';
 import type { LucideIcon } from "lucide-react";
 
 type NavItem = {
@@ -30,7 +40,7 @@ export const navItems: NavItem[] = [
             {
                 name: 'budget',
                 label: 'Budget',
-                icon: PiggyBank,
+                icon: ChartNoAxesColumn,
             }, 
             {
                 name: 'bills',
@@ -46,6 +56,11 @@ export const navItems: NavItem[] = [
                 name: 'settings',
                 label: 'Settings',
                 icon: Settings,
+            },
+            {
+                name: 'account',
+                label: 'Account',
+                icon: UserRound,
             },
             {
                 name: 'help-center',

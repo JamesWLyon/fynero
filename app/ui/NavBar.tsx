@@ -1,8 +1,8 @@
 import Link from "next/link";
 import Image from 'next/image';
 import { navItems } from "../config/nav";
-import WideButton from "./WideButton";
-import { Icon } from "lucide-react";
+import Button from "./Button";
+import Icon from "@/app/ui/Icon";
 
 function renderNav(items: any[] = [], parentPath = "") {
   return items.map((item) => {
@@ -66,7 +66,10 @@ export default function Navbar() {
             {renderNav(navItems)}
             
             <div className="mt-auto">
-                <WideButton variant="accentBorder">→ Logout</WideButton>
+                <Button variant="accentBorder">
+                    <Icon name="moveRight" />
+                    Logout
+                </Button>
             </div>
         </aside>
     );

@@ -4,21 +4,24 @@
   --primary-clr: #1F303F;
   --secondary-clr: #BCC4EA;
   --third-clr: #0E1628;
-  --forth-clr: #3F5074;
+  --fourth-clr: #3F5074;
   --accent-clr: #d4d4d4;
+  --font-color: #ffffff;
 }
 
 @theme inline {
   --color-primary: var(--primary-clr);
   --color-secondary: var(--secondary-clr);
   --color-third: var(--third-clr);
-  --color-forth: var(--forth-clr);
+  --color-fourth: var(--fourth-clr);
   --color-accent: var(--accent-clr);
+  --color-font: var(--font-color);
 }
 
 body {
-  background: radial-gradient(circle at center, var(--color-forth) 0%, var(--color-third) 85%, #0a0f1a 100%);
-  color: var(--accent-clr);
+  background: radial-gradient(circle at center, var(--color-fourth) 0%, var(--color-third) 85%, #0a0f1a 100%);
+  color: var(--color-font);
   font-family: Arial, Helvetica, sans-serif;
   size: 2rem;
+  cursor: default;
 }

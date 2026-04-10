@@ -19,6 +19,9 @@ export default function WideButton({
         transition-transform
         duration-200
         hover:scale-105
+        flex
+        items-center
+        gap-2
         ${buttonVariants[variant]}
         `}
     >
