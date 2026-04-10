@@ -26,7 +26,7 @@ export default function PagesLayout({
     <div className="flex min-h-screen">
       <Navbar />
 
-      <main className="flex-1 p-6 bg-[linear-gradient(to_right,var(--third-clr),var(--forth-clr))]">
+      <main className="flex-1 p-6 bg-[linear-gradient(to_right,var(--third-clr),var(--fourth-clr))]">
         {children}
       </main>
     </div>
