@@ -19,6 +19,7 @@ export default function Button({
         py-2
         px-4
         rounded
+        flex items-center gap-2
         transition-colors
         hover:cursor-pointer
         transition-transform
