@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import StarField from "./ui/StarField";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,7 +29,12 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body>
-        {children}
+        {/* Stars */}
+        <StarField />
+
+        <main className="flex-1 z-10">
+          {children}
+        </main>
       </body>
     </html>
   );

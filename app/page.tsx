@@ -1,11 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
-import Title from "./ui/Title";
+import { Title, SubTitle } from "@/app/ui/Titles";
+import { BackgroundWrapper } from "./ui/Wrapper";
 
 export default function LandingPage() {
     return (
         <div className="min-h-screen flex flex-col gap-4 items-center justify-center text-center">
-            <Title title="Fynero" className="text-8xl tracking-tight text-shadow-lg text-shadow-slate-500" />
+            <BackgroundWrapper className="bg-[radial-gradient(circle_at_center,var(--color-fourth)_0%,var(--color-third)_85%,#05080e_100%)]" />
+            
+            <Title title="Fynero" className="text-8xl tracking-tight text-shadow-lg text-shadow-black-500" />
             <p className="text-lg text-secondary max-w-xs">
                 <span className="text-3xl">Track. Budget. Grow.</span>
                 <br />
