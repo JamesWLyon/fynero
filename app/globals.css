@@ -5,6 +5,7 @@
   --secondary-clr: #BCC4EA;
   --third-clr: #0E1628;
   --fourth-clr: #3F5074;
+  --fifth-clr: #06033a;
   --accent-clr: #d4d4d4;
   --font-color: #ffffff;
 }
@@ -14,12 +15,12 @@
   --color-secondary: var(--secondary-clr);
   --color-third: var(--third-clr);
   --color-fourth: var(--fourth-clr);
+  --color-fifth: var(--fifth-clr);
   --color-accent: var(--accent-clr);
   --color-font: var(--font-color);
 }
 
 body {
-  background: radial-gradient(circle at center, var(--color-fourth) 0%, var(--color-third) 85%, #0a0f1a 100%);
   color: var(--color-font);
   font-family: Arial, Helvetica, sans-serif;
   size: 2rem;
