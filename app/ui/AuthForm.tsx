@@ -127,7 +127,7 @@ return (
         <BackgroundWrapper variant="primary" />
             <Card className="max-w-[500px]">
                 <Title title={title} />
-                {error && <p className="text-md font-bold mt-2 text-red-500">{error}</p>}
+                {error && <p className="text-md font-bold mt-2 text-alert">{error}</p>}
 
                 <form onSubmit={handleSubmit}>
                     {showEmail && (
@@ -156,7 +156,7 @@ return (
 
                 <p className="text-md text-secondary mt-4">
                     {switchText}{' '}
-                    <Link href={switchHref} className="text-sixth hover:underline">{switchLabel}</Link>
+                    <Link href={switchHref} className="text-sixth text-alert hover:underline">{switchLabel}</Link>
                 </p>
             </Card>
         </AuthPageWrapper>

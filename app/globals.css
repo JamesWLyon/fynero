@@ -8,7 +8,8 @@
   --fifth-clr: #06033a;
   --sixth-clr: #0004ff;
   --accent-clr: #d4d4d4;
-  --font-color: #ffffff;
+  --font-clr: #ffffff;
+  --alert-clr: #d42f2f;
 }
 
 @theme inline {
@@ -19,7 +20,8 @@
   --color-fifth: var(--fifth-clr);
   --color-sixth: var(--sixth-clr);
   --color-accent: var(--accent-clr);
-  --color-font: var(--font-color);
+  --color-font: var(--font-clr);
+  --color-alert: var(--alert-clr);
 }
 
 body {
