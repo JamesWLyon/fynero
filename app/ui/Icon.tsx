@@ -13,5 +13,5 @@ export default function Icon({ name, size = 16, className }: IconProps) {
     
     if (!LucidIcon) return null;
 
-    return <LucidIcon size={size} className={className} />;
+    return <LucidIcon size={size} className={`${className || ''}`} />;
 }

@@ -10,6 +10,8 @@ import {
     ArrowRightLeft, 
     Home,
     MoveRight,
+    ChevronUp,
+    ChevronDown,
 } from 'lucide-react';
 
 export const icons = {
@@ -24,4 +26,6 @@ export const icons = {
     arrowRightLeft: ArrowRightLeft,
     home: Home,
     moveRight: MoveRight,
+    chevronUp: ChevronUp,
+    chevronDown: ChevronDown,
 };
