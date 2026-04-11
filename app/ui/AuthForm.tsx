@@ -156,7 +156,7 @@ return (
 
                 <p className="text-md text-secondary mt-4">
                     {switchText}{' '}
-                    <Link href={switchHref} className="text-alert hover:underline">{switchLabel}</Link>
+                    <Link href={switchHref} className="text-black font-bold underline hover:text-alert">{switchLabel}</Link>
                 </p>
             </Card>
         </AuthPageWrapper>
