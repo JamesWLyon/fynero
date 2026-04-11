@@ -4,13 +4,16 @@ export default function Button({
   children,
   variant = "primary",
   className,
+  type,
 }: {
   children?: React.ReactNode;
   variant?: ButtonVariant;
   className?: string;
+  type?: "button" | "submit" | "reset";
 }) {
   return (
     <button
+      type={type}
       className={`
         w-full
         py-2
