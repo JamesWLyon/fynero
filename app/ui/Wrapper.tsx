@@ -1,5 +1,7 @@
-import { Star } from "lucide-react";
 import StarField from "./StarField";
+import { backgroundVariants, BackgroundVariant } from "../config/backgrounds";
+
+type BackgroundName = keyof typeof backgroundVariants;
 
 export default function Wrapper({ children, className }: { children: React.ReactNode; className?: string }) {
     return (
@@ -9,10 +11,10 @@ export default function Wrapper({ children, className }: { children: React.React
     );
 }
 
-export function BackgroundWrapper({ className }: { className?: string }) {
+export function BackgroundWrapper({ className, variant }: { className?: string; variant: BackgroundVariant }) {
     return (
         <div className={`fixed inset-0 -z-10`}>
-            <div className={`absolute inset-0 ${className || ''}`} />
+            <div className={`absolute inset-0 ${backgroundVariants[variant]} ${className || ''}`} />
             <StarField />
         </div>
     );

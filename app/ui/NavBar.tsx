@@ -1,8 +1,13 @@
+"use client";
+
 import Link from "next/link";
 import Image from 'next/image';
 import { navItems } from "../config/nav";
 import Button from "./Button";
 import Icon from "@/app/ui/Icon";
+import { logout } from "@/lib/auth/logout";
+import { useRouter } from "next/navigation";
+
 
 function renderNav(items: any[] = [], parentPath = "") {
   return items.map((item) => {
@@ -50,27 +55,37 @@ function renderNav(items: any[] = [], parentPath = "") {
 
 
 export default function Navbar() {
-    return (
-        <aside className="w-64 h-screen bg-accent/7.5 backdrop-blur-[2.5px] border-r border-accent/10 p-4 flex flex-col relative z-50 sticky top-0">
-            <Link href="/" className="inline-flex">
-                <Image 
-                    src="/fynero-square-logo.png"
-                    alt="Fynero Logo"
-                    width={25}
-                    height={20}
-                />
+  const router = useRouter();
 
-                <span className="ml-2 text-lg font-bold">Fynero</span>
-            </Link>
+  {/* Logout Handler */}
+  async function handleLogout() {
+    await logout();
+    router.push("/");
+    router.refresh();
+  }
 
-            {renderNav(navItems)}
-            
-            <div className="mt-auto">
-                <Button variant="accentBorder">
-                    <Icon name="moveRight" />
-                    Logout
-                </Button>
-            </div>
-        </aside>
-    );
+  {/* Navbar */}
+  return (
+      <aside className="w-64 h-screen bg-accent/7.5 backdrop-blur-[2.5px] border-r border-accent/10 p-4 flex flex-col relative z-50 sticky top-0">
+          <Link href="/" className="inline-flex">
+              <Image 
+                  src="/fynero-square-logo.png"
+                  alt="Fynero Logo"
+                  width={25}
+                  height={20}
+              />
+
+              <span className="ml-2 text-lg font-bold">Fynero</span>
+          </Link>
+
+          {renderNav(navItems)}
+          
+          <div className="mt-auto">
+              <Button variant="accentBorder" click={handleLogout}>
+                  <Icon name="moveRight" />
+                  Logout
+              </Button>
+          </div>
+      </aside>
+  );
 }

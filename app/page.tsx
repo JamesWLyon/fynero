@@ -8,7 +8,7 @@ import Icon from "./ui/Icon";
 export default function LandingPage() {
     return (
         <AuthPageWrapper>
-            <BackgroundWrapper className="bg-[radial-gradient(circle_at_center,var(--color-fourth)_0%,var(--color-third)_85%,#05080e_100%)]" />
+            <BackgroundWrapper variant="primary" />
             
             <Title title="Fynero" className="text-8xl tracking-tight text-shadow-lg text-shadow-black-500" />
             <p className="text-lg text-secondary max-w-xs">

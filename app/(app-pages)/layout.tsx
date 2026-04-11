@@ -31,7 +31,7 @@ export default function PagesLayout({
       <Navbar />
 
       <main className="flex-1">
-        <BackgroundWrapper className="bg-[linear-gradient(to_right,var(--fifth-clr),var(--fourth-clr))]" />
+        <BackgroundWrapper variant="secondary" />
 
         {/* Content */}
         <div className="p-6 relative z-10">

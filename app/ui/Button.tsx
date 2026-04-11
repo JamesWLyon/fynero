@@ -5,15 +5,18 @@ export default function Button({
   variant = "primary",
   className,
   type,
+  click,
 }: {
   children?: React.ReactNode;
   variant?: ButtonVariant;
   className?: string;
   type?: "button" | "submit" | "reset";
+  click?: React.MouseEventHandler<HTMLButtonElement>;
 }) {
   return (
     <button
       type={type}
+      onClick={click}
       className={`
         w-full
         py-2
