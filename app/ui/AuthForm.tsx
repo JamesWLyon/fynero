@@ -16,12 +16,6 @@ export default function AuthForm({ formType }: { formType?: string }) {
     const router = useRouter();
     const [error, setError] = useState<string | null>(null);
     const [showConfirm, setShowConfirm] = useState(false);
-    const baseUrl =
-        process.env.NEXT_PUBLIC_SITE_URL ||
-        (process.env.VERCEL_URL
-            ? `https://${process.env.VERCEL_URL}`
-            : "http://localhost:3000");
-            
     const config = {
         login: { 
             title: "Login",
@@ -97,7 +91,7 @@ export default function AuthForm({ formType }: { formType?: string }) {
 
     } else if (formType === "forgotPassword") {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
-            redirectTo: `${baseUrl}/reset-password`,
+            redirectTo: "https://fynero.vercel.app/reset-password",
         });
 
         if (error) { 
