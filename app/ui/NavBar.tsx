@@ -32,9 +32,9 @@ function renderNav(items: any[] = [], parentPath = "") {
       <div key={path}>
         <Link
             href={path}
-            className="inline-flex items-center gap-2 text-white hover:text-blue-400"
+            className="flex items-center gap-2 text-white hover:text-blue-400 mb-1"
         >
-            {Icon && <Icon size={15} />}
+            {Icon && <Icon size={18} className="shrink-0" />}
             {item.label}
         </Link>
 
@@ -51,7 +51,7 @@ function renderNav(items: any[] = [], parentPath = "") {
 
 export default function Navbar() {
     return (
-        <aside className="w-64 h-screen bg-primary p-4 flex flex-col">
+        <aside className="w-64 h-screen bg-accent/7.5 backdrop-blur-[2.5px] border-r border-accent/10 p-4 flex flex-col relative z-50 sticky top-0">
             <Link href="/" className="inline-flex">
                 <Image 
                     src="/fynero-square-logo.png"
