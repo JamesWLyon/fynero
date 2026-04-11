@@ -17,3 +17,11 @@ export function BackgroundWrapper({ className }: { className?: string }) {
         </div>
     );
 }
+
+export function AuthPageWrapper({ children }: { children: React.ReactNode }) {
+    return (
+        <Wrapper className="min-h-screen flex flex-col gap-4 items-center justify-center text-center">
+            {children}
+        </Wrapper>
+    );
+}

@@ -1,11 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Title, SubTitle } from "@/app/ui/Titles";
-import { BackgroundWrapper } from "./ui/Wrapper";
+import { BackgroundWrapper, AuthPageWrapper } from "./ui/Wrapper";
+import Button from "./ui/Button";
+import Icon from "./ui/Icon";
 
 export default function LandingPage() {
     return (
-        <div className="min-h-screen flex flex-col gap-4 items-center justify-center text-center">
+        <AuthPageWrapper>
             <BackgroundWrapper className="bg-[radial-gradient(circle_at_center,var(--color-fourth)_0%,var(--color-third)_85%,#05080e_100%)]" />
             
             <Title title="Fynero" className="text-8xl tracking-tight text-shadow-lg text-shadow-black-500" />
@@ -14,20 +16,12 @@ export default function LandingPage() {
                 <br />
                 Take control of your money and build a future you're proud of.
             </p>
-            <Link href="/dashboard" className="
-                mt-4
-                px-6 py-3
-                rounded-full
-                bg-gradient-to-r from-blue-500 to-blue-300
-                text-third
-                font-medium
-                shadow-lg
-                hover:scale-105
-                transition
-                hover:cursor-pointer
-            ">
-                Lets start this journey →
-            </Link>
-        </div>
+            <Button variant="authButton">
+                <Link href="/login" className="flex items-center gap-2">
+                    Lets start this journey 
+                    <Icon name="moveRight" />
+                </Link>
+            </Button>
+        </AuthPageWrapper>
     );
 }

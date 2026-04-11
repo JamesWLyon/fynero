@@ -1,11 +1,13 @@
-import { buttonVariants, ButtonVariant } from "../config/buttonColors";
+import { buttonVariants, ButtonVariant } from "../config/buttons";
 
-export default function WideButton({
+export default function Button({
   children,
   variant = "primary",
+  className,
 }: {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   variant?: ButtonVariant;
+  className?: string;
 }) {
   return (
     <button
@@ -19,10 +21,8 @@ export default function WideButton({
         transition-transform
         duration-200
         hover:scale-105
-        flex
-        items-center
-        gap-2
         ${buttonVariants[variant]}
+        ${className || ""}
         `}
     >
       {children}
