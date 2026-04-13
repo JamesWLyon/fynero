@@ -4,15 +4,23 @@ export function filterByTime(transactions: any[], query?: string) {
     const now = new Date();
 
     return transactions.filter((tx) => {
-        // use whichever date field exists
         const raw = tx.date || tx.created_at;
         if (!raw) return false;
 
-        // parse safely — handles both "2026-04-13" and "2026-04-13T06:35:19.465494"
         const date = new Date(raw);
         if (isNaN(date.getTime())) return false;
 
+        // DAY
         if (query.startsWith("day")) {
+            if (query === "day:previous") {
+                const yesterday = new Date(now);
+                yesterday.setUTCDate(now.getUTCDate() - 1);
+                return (
+                    date.getUTCDate() === yesterday.getUTCDate() &&
+                    date.getUTCMonth() === yesterday.getUTCMonth() &&
+                    date.getUTCFullYear() === yesterday.getUTCFullYear()
+                );
+            }
             if (!query.includes(":")) {
                 return (
                     date.getUTCDate() === now.getUTCDate() &&
@@ -29,7 +37,16 @@ export function filterByTime(transactions: any[], query?: string) {
             );
         }
 
+        // MONTH
         if (query.startsWith("month")) {
+            if (query === "month:previous") {
+                const prevMonth = now.getUTCMonth() === 0 ? 11 : now.getUTCMonth() - 1;
+                const prevYear = now.getUTCMonth() === 0 ? now.getUTCFullYear() - 1 : now.getUTCFullYear();
+                return (
+                    date.getUTCMonth() === prevMonth &&
+                    date.getUTCFullYear() === prevYear
+                );
+            }
             if (!query.includes(":")) {
                 return (
                     date.getUTCMonth() === now.getUTCMonth() &&
@@ -38,7 +55,8 @@ export function filterByTime(transactions: any[], query?: string) {
             }
             const [, value] = query.split(":");
             const monthNames = [
-                "january","february","march","april","may","june", "july","august","september","october","november","december"
+                "january","february","march","april","may","june",
+                "july","august","september","october","november","december"
             ];
             const monthIndex = monthNames.indexOf(value.toLowerCase());
             return (
@@ -47,7 +65,11 @@ export function filterByTime(transactions: any[], query?: string) {
             );
         }
 
+        // YEAR
         if (query.startsWith("year")) {
+            if (query === "year:previous") {
+                return date.getUTCFullYear() === now.getUTCFullYear() - 1;
+            }
             if (!query.includes(":")) {
                 return date.getUTCFullYear() === now.getUTCFullYear();
             }

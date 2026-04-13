@@ -26,12 +26,27 @@ export default function Dashboard() {
 
     const barChartData = useMemo(() => [
         { 
-            label: "Expenses",   
-            value: get("expenses", "month")
+            label: "Income",   
+            value: get("income", "month")
         },
         { 
+            label: "Spent", 
+            value: get("spending", "month")
+        },
+    ], [transactions]);
+
+    const pieChartData = useMemo(() => [
+        { 
             label: "Bills", 
+            value: get("bills", "month")
+        },
+        { 
+            label: "Food",   
             value: get("expenses.food", "month")
+        },
+        { 
+            label: "Shopping",   
+            value: get("expenses.shopping", "month")
         },
     ], [transactions]);
 
@@ -84,14 +99,8 @@ export default function Dashboard() {
                     <Wrapper className="flex items-center justify-center">
                         {/* Fixed size wrapper so ResponsiveContainer has something to measure */}
                         <div style={{ width: "300px", height: "300px" }}>
-                            <SimplePieChart data={barChartData} />
+                            <SimplePieChart data={pieChartData} />
                         </div>
-                        <ul className="grid gap-4 ml-6 text-lg">
-                            <li><span className="inline-block w-4 h-4 bg-[#0088FE] mr-2"></span>Bills</li>
-                            <li><span className="inline-block w-4 h-4 bg-[#00C49F] mr-2"></span>Savings</li>
-                            <li><span className="inline-block w-4 h-4 bg-[#FFBB28] mr-2"></span>Debt</li>
-                            <li><span className="inline-block w-4 h-4 bg-[#FF8042] mr-2"></span>Expenses</li>
-                        </ul>
                     </Wrapper>
                 </Card>
                 <Card>
