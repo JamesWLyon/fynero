@@ -14,6 +14,8 @@ import { useFinance } from "@/lib/hooks/useFinance";
 import { aggregateTransactions } from "@/lib/finance/aggregate";
 import { filterByTime } from "@/lib/finance/filterTime";
 import { useEffect } from "react";
+import DeltaBadge from "@/app/ui/DeltaBadge";
+import BudgetBadge from "@/app/ui/BudgetBadge";
 
 export default function Dashboard() {
     const { get, loading, transactions } = useFinance();
@@ -57,26 +59,39 @@ export default function Dashboard() {
             <SubTitle title="Welcome back, User!" />
             <Wrapper className="grid grid-cols-4 gap-8 mt-6">
                 <Card>
-                    <CardTitle title="Account Balance" className="text-lg" />
+                    <CardTitle title="Account Balance" className="text-lg text-secondary/80" />
                     <p className="text-[2rem]"><TotalBalance /></p>
-                    <p className="flex items-center"><Icon name="chevronUp" className="mr-2" />$500 from last week</p>
+                    <p className="flex items-center">
+                        <DeltaBadge 
+                        value={get("income", "month") - get("income", "month:previous")} 
+                        suffix=" last month"/>
+                    </p>
                 </Card>
                 <Card>
-                    <CardTitle title="Monthly Spending" className="text-lg" />
-                    <p className="text-[2rem]">${get("income", "month")}</p>
-                    <p className="flex items-center"><Icon name="chevronDown" className="mr-2" />$200 from last week</p>
+                    <CardTitle title="Monthly Spending" className="text-lg text-secondary/80" />
+                    <p className="text-[2rem]">${get("spending", "month")}</p>
+                    <p className="flex items-center">
+                        <DeltaBadge 
+                        value={get("spending", "month") - get("spending", "month:previous")} 
+                        suffix=" last month" />
+                    </p>
                 </Card>
                 <Card>
-                    <CardTitle title="Budget Left" className="text-lg" />
+                    <CardTitle title="Budget Left" className="text-lg text-secondary/80" />
                     <p className="text-[2rem]">${(get("income", "month") - get("spending", "month")).toFixed(2)}</p>
-                    <p>32% left of your monthly budget of $1,656.25</p>
+                    <p>
+                        <BudgetBadge
+                            spending={get("spending", "month")}
+                            income={get("income", "month")}
+                            suffix=" of income spent"
+                        />
+                    </p>
                 </Card>
                 <Card>
-                    <CardTitle title="Upcoming Bills" className="text-lg" />
+                    <CardTitle title="Upcoming Bills" className="text-lg text-secondary/80" />
                     <p className="text-[2rem]">${get("bills", "month")}</p>
                     <ul>
                         <li>Electricity - $120.00 - Due in 5 days</li>
-                        <li>Internet - $50.00 - Due in 10 days</li>
                     </ul>
                 </Card>
             </Wrapper>
