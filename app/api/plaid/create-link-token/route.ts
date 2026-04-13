@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { Configuration, PlaidApi, PlaidEnvironments } from "plaid";
+import { Products } from "plaid";
+import { CountryCode } from "plaid";
 
 const client = new PlaidApi(
     new Configuration({
@@ -20,8 +22,11 @@ export async function POST() {
                 client_user_id: "test-user-id", // we'll replace this later
             },
             client_name: "Fynero",
-            products: ["transactions"],
-            country_codes: ["US"],
+            products: [Products.Transactions],
+            country_codes: [
+                CountryCode.Us, 
+                CountryCode.Ca
+            ],
             language: "en",
         });
 
