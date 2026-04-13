@@ -1,36 +1,109 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 💸 Fynero — Smart Budgeting & Financial Dashboard
 
-## Getting Started
+Fynero is a modern, full-stack personal finance application that helps users track spending, analyze financial habits, and connect real bank accounts for accurate, real-time data.
 
-First, run the development server:
+Built with scalability and real-world fintech architecture in mind, Fynero combines bank API integration, custom categorization logic, and dynamic data visualization into a clean and intuitive dashboard experience.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## 🚀 Features
+
+### 🔗 Bank Account Integration (Plaid)
+- Securely connect real bank accounts
+- Sync transactions automatically
+- Support for US and Canada
+
+---
+
+### 📊 Smart Transaction Categorization
+- Custom category engine (food, bills, subscriptions, etc.)
+- Nested categories (e.g. `expenses → bills → subscriptions`)
+- Override system for better accuracy
+
+---
+
+### 📅 Time-Based Analytics
+
+View data by:
+- Day
+- Month
+- Year
+- All-time
+
+---
+
+### 💰 Financial Aggregation Engine
+
+Real-time totals for:
+- Income
+- Expenses
+- Savings
+- Debt
+
+Dynamic queries:
+```
+data.expenses.bills.subscriptions
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 📈 Dashboard Ready
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Designed for:
+- Pie charts
+- Spending breakdowns
+- Budget tracking
+- Net worth calculations
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+### 🔐 Authentication System
+- Secure login/signup via **Supabase Auth**
+- Password reset & email flow
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🛠️ Tech Stack
 
-## Deploy on Vercel
+### Frontend
+- **Next.js** (App Router)
+- **React**
+- **TypeScript**
+- **Tailwind CSS**
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Backend
+- **Next.js API Routes**
+- Server-side logic for:
+  - Plaid token exchange
+  - Transaction syncing
+  - Balance fetching
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Database & Auth
+- **Supabase**
+  - PostgreSQL database
+  - Row Level Security (RLS)
+  - User authentication
+
+### APIs
+- **Plaid API**
+  - Transactions API (`/transactions/sync`)
+  - Accounts API (`/accounts/balance/get`)
+  - Link API (bank connection)
+
+---
+
+## 🧠 Example Usage
+
+```tsx
+const { get } = useFinance();
+
+<p>{get("expenses.food", "month")}</p>
+<p>{get("expenses.bills.subscriptions", "month")}</p>
+<p>{get("income", "year")}</p>
+```
+
+---
+
+## 💡 Summary
+
+Fynero is designed to function as a scalable financial platform, providing users with powerful insights into their spending and financial habits while maintaining a clean, developer-friendly architecture.
