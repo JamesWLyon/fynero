@@ -1,0 +1,8 @@
+1.  Need to clean up the ui and the layout on the link bank page as well as auto-sync
+    it so the user dosnt have to press a button to do that.
+
+2.  Need to start adding ui to all the pages based off the layout on the figma design.
+
+3.  Need to connect an actual domain to the site.
+
+4. Need to start cleaning up the tailwind/css so its mobile responsive as well.
