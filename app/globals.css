@@ -10,6 +10,7 @@
   --accent-clr: #d4d4d4;
   --font-clr: #ffffff;
   --alert-clr: #d42f2f;
+  --transparent-clr: rgba(255, 255, 255, 0);
 }
 
 @theme inline {
@@ -22,6 +23,7 @@
   --color-accent: var(--accent-clr);
   --color-font: var(--font-clr);
   --color-alert: var(--alert-clr);
+  --color-transparent: var(--transparent-clr);
 }
 
 body {
