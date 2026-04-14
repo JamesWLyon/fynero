@@ -10,8 +10,8 @@ export async function POST(req: Request) {
     const { data, error } = await resend.emails.send({
       from: `Fynero <${process.env.EMAIL_FROM}>`,
       to: email,
-      subject: "Test Email 🚀",
-      html: "<p>This is your first email from Fynero 🔥</p>",
+      subject: "Test Email",
+      html: "<p>This is your first email from Fynero.</p>",
     });
 
     if (error) {
