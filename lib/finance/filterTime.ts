@@ -1,4 +1,29 @@
-export function filterByTime(transactions: any[], query?: string) {
+import { TimeFilter } from "./TimeFilter";
+
+export function filterByTime(transactions: any[], query?: TimeFilter) {
+    if (typeof query === "object" && query !== null) {
+        return transactions.filter((tx) => {
+            const raw = tx.date || tx.created_at;
+            if (!raw) return false;
+
+            const date = new Date(raw);
+            if (isNaN(date.getTime())) return false;
+
+            if (query.month && query.year) {
+                return (
+                    date.getUTCMonth() + 1 === query.month &&
+                    date.getUTCFullYear() === query.year
+                );
+            }
+
+            if (query.year) {
+                return date.getUTCFullYear() === query.year;
+            }
+
+            return true;
+        });
+    }
+
     if (!query || query === "all") return transactions;
 
     const now = new Date();
@@ -21,6 +46,7 @@ export function filterByTime(transactions: any[], query?: string) {
                     date.getUTCFullYear() === yesterday.getUTCFullYear()
                 );
             }
+
             if (!query.includes(":")) {
                 return (
                     date.getUTCDate() === now.getUTCDate() &&
@@ -28,8 +54,10 @@ export function filterByTime(transactions: any[], query?: string) {
                     date.getUTCFullYear() === now.getUTCFullYear()
                 );
             }
+
             const [, value] = query.split(":");
             const target = new Date(value);
+
             return (
                 date.getUTCDate() === target.getUTCDate() &&
                 date.getUTCMonth() === target.getUTCMonth() &&
@@ -41,24 +69,32 @@ export function filterByTime(transactions: any[], query?: string) {
         if (query.startsWith("month")) {
             if (query === "month:previous") {
                 const prevMonth = now.getUTCMonth() === 0 ? 11 : now.getUTCMonth() - 1;
-                const prevYear = now.getUTCMonth() === 0 ? now.getUTCFullYear() - 1 : now.getUTCFullYear();
+                const prevYear = now.getUTCMonth() === 0
+                    ? now.getUTCFullYear() - 1
+                    : now.getUTCFullYear();
+
                 return (
                     date.getUTCMonth() === prevMonth &&
                     date.getUTCFullYear() === prevYear
                 );
             }
+
             if (!query.includes(":")) {
                 return (
                     date.getUTCMonth() === now.getUTCMonth() &&
                     date.getUTCFullYear() === now.getUTCFullYear()
                 );
             }
+
             const [, value] = query.split(":");
+
             const monthNames = [
                 "january","february","march","april","may","june",
                 "july","august","september","october","november","december"
             ];
+
             const monthIndex = monthNames.indexOf(value.toLowerCase());
+
             return (
                 date.getUTCMonth() === monthIndex &&
                 date.getUTCFullYear() === now.getUTCFullYear()
@@ -70,10 +106,13 @@ export function filterByTime(transactions: any[], query?: string) {
             if (query === "year:previous") {
                 return date.getUTCFullYear() === now.getUTCFullYear() - 1;
             }
+
             if (!query.includes(":")) {
                 return date.getUTCFullYear() === now.getUTCFullYear();
             }
+
             const [, value] = query.split(":");
+
             return date.getUTCFullYear() === Number(value);
         }
 

@@ -12,10 +12,11 @@ import TotalBalance from "@/app/ui/plaid/TotalBalance";
 import { useFinance } from "@/lib/hooks/useFinance";
 import { aggregateTransactions } from "@/lib/finance/aggregate";
 import { filterByTime } from "@/lib/finance/filterTime";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import DeltaBadge from "@/app/ui/DeltaBadge";
 import BudgetBadge from "@/app/ui/BudgetBadge";
 import UsernameDisplay from "@/app/ui/UsernameDisplay";
+import { Link } from "lucide-react";
 
 export default function Dashboard() {
     const { get, loading, transactions } = useFinance();
@@ -26,31 +27,27 @@ export default function Dashboard() {
         console.log("📊 full aggregated tree:", JSON.stringify(debug, null, 2));
     }, [transactions]);
 
+    const [barDate, setBarDate] = useState({
+        month: new Date().getMonth() + 1,
+        year: new Date().getFullYear(),
+    });
+
+    const [pieDate, setPieDate] = useState({
+        month: new Date().getMonth() + 1,
+        year: new Date().getFullYear(),
+    });
+
     const barChartData = useMemo(() => [
-        { 
-            label: "Income",   
-            value: get("income", "month")
-        },
-        { 
-            label: "Spent", 
-            value: get("spending", "month")
-        },
-    ], [transactions]);
+        { label: "Income", value: get("income", barDate) },
+        { label: "Spent",  value: get("spending", barDate) },
+    ], [get, barDate.month, barDate.year]);
 
     const pieChartData = useMemo(() => [
-        { 
-            label: "Bills", 
-            value: get("bills", "month")
-        },
-        { 
-            label: "Food",   
-            value: get("expenses.food", "month")
-        },
-        { 
-            label: "Shopping",   
-            value: get("expenses.shopping", "month")
-        },
-    ], [transactions]);
+        { label: "Bills",    value: get("bills", pieDate) },
+        { label: "Food",     value: get("expenses.food", pieDate) },
+        { label: "Shopping", value: get("expenses.shopping", pieDate) },
+    ], [get, pieDate.month, pieDate.year]); 
+    
 
     return (
         <>
@@ -105,7 +102,7 @@ export default function Dashboard() {
                 <Card>
                     <Wrapper className="flex">
                         <CardTitle title="Income vs Expenses" className="text-[2rem]" />
-                        <MonthYearDropdown className="ml-auto" />
+                        <MonthYearDropdown onChange={setBarDate} className="ml-auto" />
                     </Wrapper>
                     {/* Fixed size wrapper so ResponsiveContainer has something to measure */}
                     <div style={{ width: "100%", height: "300px" }}>
@@ -115,7 +112,7 @@ export default function Dashboard() {
                 <Card>
                     <Wrapper className="flex">
                         <CardTitle title="Spending Breakdown" className="text-[2rem]" />
-                        <MonthYearDropdown className="ml-auto" />
+                        <MonthYearDropdown onChange={setPieDate} className="ml-auto" />
                     </Wrapper>
                     <Wrapper className="flex items-center justify-center">
                         {/* Fixed size wrapper so ResponsiveContainer has something to measure */}
@@ -126,6 +123,10 @@ export default function Dashboard() {
                 </Card>
                 <Card>
                     <CardTitle title="Recent Transactions" className="text-[2rem]" />
+
+                    <Link href="/transactions">
+                    View All
+                    </Link>
                 </Card>
                 <Card>
                     <CardTitle title="Budget Overview" className="text-[2rem]" />

@@ -1,26 +1,30 @@
 import { aggregateTransactions } from "./aggregate";
 import { filterByTime } from "./filterTime";
+import { TimeFilter } from "./TimeFilter";
 
 export function getValue(
     transactions: any[],
     path: string,
-    timeQuery: string = "all"
+    timeQuery: TimeFilter = "all"
 ): number {
     if (!transactions || transactions.length === 0) return 0;
 
     const filtered = filterByTime(transactions, timeQuery);
+
     const data = aggregateTransactions(filtered);
 
     const keys = path.split(".");
-    let current = data;
+    let current: any = data;
 
     for (const key of keys) {
-        if (current[key] === undefined) return 0;
+        if (current?.[key] === undefined) return 0;
         current = current[key];
     }
 
     if (typeof current === "object" && current !== null) {
-        if ("total" in current) return Math.round(current.total * 100) / 100; // ← fix
+        if ("total" in current) {
+            return Math.round(current.total * 100) / 100;
+        }
         return 0;
     }
 

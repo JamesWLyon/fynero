@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { getValue } from "@/lib/finance/getValue";
+import { TimeFilter } from "@/lib/finance/TimeFilter";
 
 export function useFinance() {
     const [transactions, setTransactions] = useState<any[]>([]);
@@ -32,7 +33,7 @@ export function useFinance() {
         transactions,
         loading,
 
-        get: (path: string, time?: string) =>
+        get: (path: string, time?: TimeFilter) =>
             getValue(transactions, path, time),
     };
 }
