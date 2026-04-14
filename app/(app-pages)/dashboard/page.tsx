@@ -60,7 +60,9 @@ export default function Dashboard() {
             <Wrapper className="grid grid-cols-4 gap-8 mt-6">
                 <Card>
                     <CardTitle title="Account Balance" className="text-lg text-secondary/80" />
-                    <p className="text-[2rem]"><TotalBalance /></p>
+                    <p className="text-[2rem]">
+                        <TotalBalance breakdown />
+                    </p>
                     <p className="flex items-center">
                         <DeltaBadge 
                         value={get("income", "month") - get("income", "month:previous")} 
