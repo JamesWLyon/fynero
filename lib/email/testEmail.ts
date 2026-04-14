@@ -8,7 +8,7 @@ export async function POST(req: Request) {
     const { email } = await req.json();
 
     const { data, error } = await resend.emails.send({
-      from: "onboarding@resend.dev",
+      from: `Fynero <${process.env.EMAIL_FROM}>`,
       to: email,
       subject: "Test Email 🚀",
       html: "<p>This is your first email from Fynero 🔥</p>",
