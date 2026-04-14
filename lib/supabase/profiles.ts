@@ -64,7 +64,7 @@ export async function isUsernameAvailable(username: string): Promise<boolean> {
   const { data } = await supabase
     .from("profiles_public")
     .select("id")
-    .eq("username", username)
+    .ilike("username", username)
     .maybeSingle();
 
   return data === null;

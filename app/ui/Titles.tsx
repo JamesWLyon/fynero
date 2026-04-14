@@ -4,9 +4,9 @@ export function Title({ title, className }: { title: string; className?: string 
     );
 }
 
-export function SubTitle({ title, className }: { title: string; className?: string }) {
+export function SubTitle({ children, className }: { children: React.ReactElement; className?: string }) {
     return (
-        <h2 className={`text-lg text-gray-200 font-semibold ${className || ''}`}>{title}</h2>
+        <h2 className={`text-lg text-gray-200 font-semibold ${className || ''}`}>{children}</h2>
     );
 }
 

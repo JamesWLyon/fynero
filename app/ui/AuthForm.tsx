@@ -275,7 +275,7 @@ export default function AuthForm({ formType }: { formType?: string }) {
                 placeholder="Username"
                 required
                 value={username}
-                onChange={(e) => setUsername(e.target.value.toLowerCase())}
+                onChange={(e) => setUsername(e.target.value)}
                 className={`w-full p-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary transition-colors ${
                   usernameStatus === "available"
                     ? "border-green-400"

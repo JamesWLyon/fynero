@@ -15,6 +15,7 @@ import { filterByTime } from "@/lib/finance/filterTime";
 import { useEffect } from "react";
 import DeltaBadge from "@/app/ui/DeltaBadge";
 import BudgetBadge from "@/app/ui/BudgetBadge";
+import UsernameDisplay from "@/app/ui/UsernameDisplay";
 
 export default function Dashboard() {
     const { get, loading, transactions } = useFinance();
@@ -55,7 +56,11 @@ export default function Dashboard() {
         <>
             <AutoSync />
             <Title title="Dashboard" />
-            <SubTitle title="Welcome back, User!" />
+            <SubTitle>
+                <span>
+                    Welcome back, <UsernameDisplay />
+                </span>
+            </SubTitle>
             <Wrapper className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-6">
                 <Card>
                     <CardTitle title="Account Balance" className="text-lg text-secondary/80" />
