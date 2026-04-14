@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Navbar from "../ui/NavBar";
-import StarField from "../ui/StarField";
 import { BackgroundWrapper } from "../ui/Wrapper";
 
 const geistSans = Geist({
@@ -19,8 +18,6 @@ export const metadata: Metadata = {
   description: "Made by James Lyon",
 };
 
-const stars = Array.from({ length: 80 });
-
 export default function PagesLayout({
   children,
 }: Readonly<{
@@ -33,8 +30,8 @@ export default function PagesLayout({
       <main className="flex-1">
         <BackgroundWrapper variant="secondary" />
 
-        {/* Content */}
-        <div className="p-6 relative z-10">
+        {/* pt-16 on mobile gives room for the hamburger button, removed on md+ */}
+        <div className="p-6 pt-16 md:pt-6 relative z-10">
           {children}
         </div>
       </main>

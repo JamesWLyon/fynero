@@ -6,7 +6,6 @@ import { Title, SubTitle, CardTitle } from "@/app/ui/Titles";
 import Wrapper from "@/app/ui/Wrapper";
 import SimpleBarChart from "@/app/ui/charts/SimpleBarChart";
 import SimplePieChart from "@/app/ui/charts/SimplePieChart";
-import Icon from "@/app/ui/Icon";
 import MonthYearDropdown from "@/app/ui/MonthYearDropdown";
 import AutoSync from "@/app/ui/plaid/AutoSync";
 import TotalBalance from "@/app/ui/plaid/TotalBalance";
@@ -57,7 +56,7 @@ export default function Dashboard() {
             <AutoSync />
             <Title title="Dashboard" />
             <SubTitle title="Welcome back, User!" />
-            <Wrapper className="grid grid-cols-4 gap-8 mt-6">
+            <Wrapper className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-6">
                 <Card>
                     <CardTitle title="Account Balance" className="text-lg text-secondary/80" />
                     <p className="text-[2rem]">
@@ -97,7 +96,7 @@ export default function Dashboard() {
                     </ul>
                 </Card>
             </Wrapper>
-            <Wrapper className="grid grid-cols-2 gap-8 mt-6">
+            <Wrapper className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6">
                 <Card>
                     <Wrapper className="flex">
                         <CardTitle title="Income vs Expenses" className="text-[2rem]" />
