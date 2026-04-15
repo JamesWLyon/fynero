@@ -1,5 +1,5 @@
 export const CATEGORY_RULES = {
-  // 🟢 INCOME
+  // INCOME
   income: {
     keywords: [
         "payroll", 
@@ -10,7 +10,7 @@ export const CATEGORY_RULES = {
     plaid: ["INCOME"],
   },
 
-  // 🔵 SAVINGS / TRANSFERS
+  // SAVINGS / TRANSFERS
   savings: {
     keywords: [
         "transfer",
@@ -19,13 +19,17 @@ export const CATEGORY_RULES = {
     plaid: ["TRANSFER"],
   },
 
-  // 🟡 DEBT
+  // DEBT
   debt: {
-    keywords: ["loan", "credit card", "payment"],
+    keywords: [
+      "loan", 
+      "credit card", 
+      "payment"
+    ],
     plaid: ["LOAN_PAYMENTS", "CREDIT_CARD_PAYMENT"],
   },
 
-  // 🔴 EXPENSES (main bucket)
+  // EXPENSES (main bucket)
   expenses: {
     children: {
       // Bills
@@ -82,3 +86,16 @@ export const CATEGORY_RULES = {
     },
   },
 };
+
+{/* Function made to obtain the children of a parent category */}
+export function getChildKeys(parent: string): string[] {
+    const keys = parent.split(".");
+    let node: any = CATEGORY_RULES;
+    for (const key of keys) {
+        node = node[key];
+    }
+    if (node?.children) {
+        return Object.keys(node.children).map((k) => `${parent}.${k}`);
+    }
+    return [parent];
+}
