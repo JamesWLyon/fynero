@@ -1,9 +1,6 @@
 "use client";
 
-import {
-    Pie, PieChart, Cell, Tooltip, Legend,
-    ResponsiveContainer, type PieLabelRenderProps,
-} from "recharts";
+import { Pie, PieChart, Cell, Tooltip, Legend, ResponsiveContainer, type PieLabelRenderProps } from "recharts";
 import { useChartData, type ChartDataEntry } from "@/app/config/useChartData";
 
 interface SimplePieChartProps {

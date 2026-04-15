@@ -41,13 +41,13 @@ export default function Dashboard() {
     });
 
     const barChartData = useMemo(() => [
-        {
-            label: "Budget",
-            value: 100,
-        },
         { 
             label: "Income", 
             value: get("income", barDate) 
+        },
+        {
+            label: "Budget",
+            value: 100,
         },
         { 
             label: "Spent",  
