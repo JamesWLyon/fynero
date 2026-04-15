@@ -14,11 +14,12 @@ import SimpleBarChart from "@/app/ui/charts/SimpleBarChart";
 import SimplePieChart from "@/app/ui/charts/SimplePieChart";
 import AutoSync from "@/app/ui/plaid/AutoSync";
 import TotalBalance from "@/app/ui/plaid/TotalBalance";
+import ShowTransactions from "@/app/ui/TransactionsTable";
 
 import { useFinance } from "@/lib/hooks/useFinance";
 
 export default function Dashboard() {
-    const { get, loading } = useFinance();
+    const { transactions, get, loading } = useFinance();
 
     const [selectedDate, setSelectedDate] = useState({
         month: new Date().getMonth() + 1,
@@ -175,8 +176,16 @@ export default function Dashboard() {
                 </Card>
 
                 <Card>
-                    <CardTitle title="Recent Transactions" className="text-[2rem]" />
-                    <Link href="/transactions">View All</Link>
+                    <CardTitle title="Recent Transactions" className="text-[2rem] overflow-hidden" />
+                    <ShowTransactions
+                        transactions={transactions}
+                        limit={4}
+                        showCategory
+                        showAmount
+                        showIcon
+                        className=""
+                    />
+                    <Link href="/transactions"></Link>
                 </Card>
 
                 <Card>
