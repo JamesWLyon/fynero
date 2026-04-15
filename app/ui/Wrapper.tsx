@@ -11,14 +11,6 @@ export default function Wrapper({ children, className }: { children: React.React
     );
 }
 
-export function DivWrapper({ children, className }: { children: React.ReactNode; className?: string }) {
-    return (
-        <div className={`w-full ${className || ''}`}>
-            {children}
-        </div>
-    );
-}
-
 export function BackgroundWrapper({ className, variant }: { className?: string; variant: BackgroundVariant }) {
     return (
         <div className={`fixed inset-0 -z-10`}>
