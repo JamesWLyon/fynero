@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useMemo, useCallback, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 import { aggregateTransactions } from "@/lib/finance/aggregate";
@@ -22,6 +22,7 @@ export function useFinance() {
 
             if (error) {
                 console.error(error);
+                setLoading(false);
                 return;
             }
 
@@ -32,13 +33,11 @@ export function useFinance() {
         load();
     }, []);
 
-    // aggregate once for all-time
     const aggregatedAll = useMemo(() => {
         return aggregateTransactions(transactions);
     }, [transactions]);
 
-    // getter function
-    const get = (path: string, time?: TimeFilter) => {
+    const get = useCallback((path: string, time?: TimeFilter) => {
         if (!time || time === "all") {
             return getValue(aggregatedAll, path);
         }
@@ -47,7 +46,7 @@ export function useFinance() {
         const aggregated = aggregateTransactions(filtered);
 
         return getValue(aggregated, path);
-    };
+    }, [transactions, aggregatedAll]);
 
     return {
         transactions,

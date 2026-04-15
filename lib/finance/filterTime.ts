@@ -1,119 +1,130 @@
 import { TimeFilter } from "./TimeFilter";
 
+function getValidDate(raw: any) {
+    const date = new Date(raw);
+    return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function isSameUtcDay(a: Date, b: Date) {
+    return (
+        a.getUTCDate() === b.getUTCDate() &&
+        a.getUTCMonth() === b.getUTCMonth() &&
+        a.getUTCFullYear() === b.getUTCFullYear()
+    );
+}
+
+function isSameUtcMonth(a: Date, month: number, year: number) {
+    return a.getUTCMonth() + 1 === month && a.getUTCFullYear() === year;
+}
+
+function isSameUtcYear(a: Date, year: number) {
+    return a.getUTCFullYear() === year;
+}
+
+function getPreviousUtcMonthYear(now: Date) {
+    const month = now.getUTCMonth() === 0 ? 12 : now.getUTCMonth();
+    const year = now.getUTCMonth() === 0
+        ? now.getUTCFullYear() - 1
+        : now.getUTCFullYear();
+
+    return { month, year };
+}
+
 export function filterByTime(transactions: any[], query?: TimeFilter) {
+    if (!query || query === "all") {
+        return transactions;
+    }
+
     if (typeof query === "object" && query !== null) {
         return transactions.filter((tx) => {
             const raw = tx.date || tx.created_at;
-            if (!raw) return false;
-
-            const date = new Date(raw);
-            if (isNaN(date.getTime())) return false;
+            const date = getValidDate(raw);
+            if (!date) return false;
 
             if (query.month && query.year) {
-                return (
-                    date.getUTCMonth() + 1 === query.month &&
-                    date.getUTCFullYear() === query.year
-                );
+                return isSameUtcMonth(date, query.month, query.year);
             }
 
             if (query.year) {
-                return date.getUTCFullYear() === query.year;
+                return isSameUtcYear(date, query.year);
             }
 
             return true;
         });
     }
 
-    if (!query || query === "all") return transactions;
-
     const now = new Date();
 
     return transactions.filter((tx) => {
         const raw = tx.date || tx.created_at;
-        if (!raw) return false;
+        const date = getValidDate(raw);
+        if (!date) return false;
 
-        const date = new Date(raw);
-        if (isNaN(date.getTime())) return false;
-
-        // DAY
         if (query.startsWith("day")) {
             if (query === "day:previous") {
-                const yesterday = new Date(now);
-                yesterday.setUTCDate(now.getUTCDate() - 1);
-                return (
-                    date.getUTCDate() === yesterday.getUTCDate() &&
-                    date.getUTCMonth() === yesterday.getUTCMonth() &&
-                    date.getUTCFullYear() === yesterday.getUTCFullYear()
-                );
+                const previousDay = new Date(now);
+                previousDay.setUTCDate(previousDay.getUTCDate() - 1);
+                return isSameUtcDay(date, previousDay);
             }
 
             if (!query.includes(":")) {
-                return (
-                    date.getUTCDate() === now.getUTCDate() &&
-                    date.getUTCMonth() === now.getUTCMonth() &&
-                    date.getUTCFullYear() === now.getUTCFullYear()
-                );
+                return isSameUtcDay(date, now);
             }
 
             const [, value] = query.split(":");
-            const target = new Date(value);
+            const target = getValidDate(value);
+            if (!target) return false;
 
-            return (
-                date.getUTCDate() === target.getUTCDate() &&
-                date.getUTCMonth() === target.getUTCMonth() &&
-                date.getUTCFullYear() === target.getUTCFullYear()
-            );
+            return isSameUtcDay(date, target);
         }
 
-        // MONTH
         if (query.startsWith("month")) {
             if (query === "month:previous") {
-                const prevMonth = now.getUTCMonth() === 0 ? 11 : now.getUTCMonth() - 1;
-                const prevYear = now.getUTCMonth() === 0
-                    ? now.getUTCFullYear() - 1
-                    : now.getUTCFullYear();
-
-                return (
-                    date.getUTCMonth() === prevMonth &&
-                    date.getUTCFullYear() === prevYear
-                );
+                const { month, year } = getPreviousUtcMonthYear(now);
+                return isSameUtcMonth(date, month, year);
             }
 
             if (!query.includes(":")) {
-                return (
-                    date.getUTCMonth() === now.getUTCMonth() &&
-                    date.getUTCFullYear() === now.getUTCFullYear()
-                );
+                return isSameUtcMonth(date, now.getUTCMonth() + 1, now.getUTCFullYear());
             }
 
             const [, value] = query.split(":");
 
             const monthNames = [
-                "january","february","march","april","may","june",
-                "july","august","september","october","november","december"
+                "january",
+                "february",
+                "march",
+                "april",
+                "may",
+                "june",
+                "july",
+                "august",
+                "september",
+                "october",
+                "november",
+                "december",
             ];
 
             const monthIndex = monthNames.indexOf(value.toLowerCase());
+            if (monthIndex === -1) return false;
 
-            return (
-                date.getUTCMonth() === monthIndex &&
-                date.getUTCFullYear() === now.getUTCFullYear()
-            );
+            return isSameUtcMonth(date, monthIndex + 1, now.getUTCFullYear());
         }
 
-        // YEAR
         if (query.startsWith("year")) {
             if (query === "year:previous") {
-                return date.getUTCFullYear() === now.getUTCFullYear() - 1;
+                return isSameUtcYear(date, now.getUTCFullYear() - 1);
             }
 
             if (!query.includes(":")) {
-                return date.getUTCFullYear() === now.getUTCFullYear();
+                return isSameUtcYear(date, now.getUTCFullYear());
             }
 
             const [, value] = query.split(":");
+            const year = Number(value);
+            if (Number.isNaN(year)) return false;
 
-            return date.getUTCFullYear() === Number(value);
+            return isSameUtcYear(date, year);
         }
 
         return true;
