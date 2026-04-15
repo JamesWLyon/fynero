@@ -14,7 +14,7 @@ import SimpleBarChart from "@/app/ui/charts/SimpleBarChart";
 import SimplePieChart from "@/app/ui/charts/SimplePieChart";
 import AutoSync from "@/app/ui/plaid/AutoSync";
 import TotalBalance from "@/app/ui/plaid/TotalBalance";
-import ShowTransactions from "@/app/ui/TransactionsTable";
+import ShowTransactions from "@/app/ui/transaction-data/TransactionsTable";
 
 import { useFinance } from "@/lib/hooks/useFinance";
 
@@ -26,7 +26,7 @@ export default function Dashboard() {
         year: new Date().getFullYear(),
     });
 
-    const monthData = useMemo(() => {
+    const transactionData = useMemo(() => {
         const income = get("income", "month");
         const spent = get("spent", "month");
         const prevSpent = get("spent", "month:previous");
@@ -110,10 +110,10 @@ export default function Dashboard() {
 
                 <Card>
                     <CardTitle title="Current Month Spending" className="text-lg text-secondary/80" />
-                    <p className="text-[2rem]">${monthData.spent}</p>
+                    <p className="text-[2rem]">${transactionData.spent}</p>
                     <p className="flex items-center">
                         <DeltaBadge
-                            value={monthData.spent - monthData.prevSpent}
+                            value={transactionData.spent - transactionData.prevSpent}
                             suffix=" last month"
                         />
                     </p>
@@ -121,11 +121,11 @@ export default function Dashboard() {
 
                 <Card>
                     <CardTitle title="Budget Left of Current Month" className="text-lg text-secondary/80" />
-                    <p className="text-[2rem]">${monthData.budgetLeft.toFixed(2)}</p>
+                    <p className="text-[2rem]">${transactionData.budgetLeft.toFixed(2)}</p>
                     <p>
                         <BudgetBadge
-                            spending={monthData.spent}
-                            income={monthData.income}
+                            spending={transactionData.spent}
+                            income={transactionData.income}
                             suffix=" of income spent"
                         />
                     </p>
@@ -133,7 +133,7 @@ export default function Dashboard() {
 
                 <Card>
                     <CardTitle title="Upcoming Bills" className="text-lg text-secondary/80" />
-                    <p className="text-[2rem]">${monthData.bills}</p>
+                    <p className="text-[2rem]">${transactionData.bills}</p>
                     <ul>
                         <li>Electricity - $120.00 - Due in 5 days</li>
                     </ul>
