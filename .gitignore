@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# text files
+fynero_finance_guide.txt
+to-do-list.txt
