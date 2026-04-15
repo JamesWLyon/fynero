@@ -108,7 +108,7 @@ export default function Dashboard() {
                 </Card>
 
                 <Card>
-                    <CardTitle title="Monthly spent" className="text-lg text-secondary/80" />
+                    <CardTitle title="Monthly Spending" className="text-lg text-secondary/80" />
                     <p className="text-[2rem]">${monthData.spent}</p>
                     <p className="flex items-center">
                         <DeltaBadge
