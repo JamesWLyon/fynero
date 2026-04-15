@@ -1,4 +1,10 @@
 export const chartColors: Record<string, string> = {
+    // Budget
+    budget:        "#ffc400", // yellow
+
+    // Spent
+    spent:         "#cf6060", // light red
+
     // Bills
     subscriptions: "#6366f1", // indigo
     expenses:      "#f59e0b", // amber

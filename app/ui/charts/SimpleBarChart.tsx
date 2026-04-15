@@ -1,10 +1,8 @@
 "use client";
 
-import {
-    BarChart, Bar, XAxis, YAxis, CartesianGrid,
-    Tooltip, Legend, ResponsiveContainer,
-} from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { useChartData, type ChartDataEntry } from "@/app/config/useChartData";
+import type { LegendProps } from "recharts";
 
 interface SimpleBarChartProps {
     data: ChartDataEntry[];
@@ -13,9 +11,13 @@ interface SimpleBarChartProps {
 const SimpleBarChart = ({ data }: SimpleBarChartProps) => {
     const resolved = useChartData(data);
 
+    const ordered = data
+        .map(d => resolved.find(r => r.label === d.label))
+        .filter(Boolean) as typeof resolved;
+
     const chartData = [{
         name: "Summary",
-        ...Object.fromEntries(resolved.map((e) => [e.label, e.value]))
+        ...Object.fromEntries(ordered.map((e) => [e.label, e.value]))
     }];
 
     return (
@@ -28,8 +30,24 @@ const SimpleBarChart = ({ data }: SimpleBarChartProps) => {
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Legend />
-                {resolved.map((entry) => (
+                <Legend
+                    content={() => (
+                        <div className="flex gap-4 justify-center mt-2">
+                            {ordered.map((entry) => (
+                                <div key={entry.label} className="flex items-center gap-2">
+                                    <div
+                                        className="w-3 h-3 rounded-sm"
+                                        style={{ backgroundColor: entry.color }}
+                                    />
+                                    <span className="text-sm text-white/80">
+                                        {entry.label}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                />
+                {ordered.map((entry) => (
                     <Bar
                         key={entry.label}
                         dataKey={entry.label}

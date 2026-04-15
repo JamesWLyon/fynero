@@ -32,7 +32,11 @@ const renderCustomizedLabel = ({
 export default function SimplePieChart({ data, isAnimationActive = true }: SimplePieChartProps) {
     const resolved = useChartData(data);
 
-    const pieData = resolved.map((e) => ({ name: e.label, value: e.value }));
+    const ordered = data
+        .map(d => resolved.find(r => r.label === d.label))
+        .filter(Boolean) as typeof resolved;
+
+    const pieData = ordered.map((e) => ({ name: e.label, value: e.value }));
 
     return (
         <ResponsiveContainer width="100%" height="100%">
@@ -44,12 +48,28 @@ export default function SimplePieChart({ data, isAnimationActive = true }: Simpl
                     dataKey="value"
                     isAnimationActive={isAnimationActive}
                 >
-                    {resolved.map((entry, index) => (
+                    {ordered.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                 </Pie>
                 <Tooltip />
-                <Legend />
+                <Legend
+                    content={() => (
+                        <div className="flex gap-4 justify-center mt-2">
+                            {ordered.map((entry) => (
+                                <div key={entry.label} className="flex items-center gap-2">
+                                    <div
+                                        className="w-3 h-3 rounded-sm"
+                                        style={{ backgroundColor: entry.color }}
+                                    />
+                                    <span className="text-sm text-white/80">
+                                        {entry.label}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                />
             </PieChart>
         </ResponsiveContainer>
     );

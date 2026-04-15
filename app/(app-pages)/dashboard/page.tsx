@@ -1,30 +1,33 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "lucide-react";
+
 import Card from "@/app/ui/Card";
+import DeltaBadge from "@/app/ui/DeltaBadge";
+import BudgetBadge from "@/app/ui/BudgetBadge";
+import MonthYearDropdown from "@/app/ui/MonthYearDropdown";
 import { Title, SubTitle, CardTitle } from "@/app/ui/Titles";
+import UsernameDisplay from "@/app/ui/UsernameDisplay";
 import Wrapper from "@/app/ui/Wrapper";
 import SimpleBarChart from "@/app/ui/charts/SimpleBarChart";
 import SimplePieChart from "@/app/ui/charts/SimplePieChart";
-import MonthYearDropdown from "@/app/ui/MonthYearDropdown";
 import AutoSync from "@/app/ui/plaid/AutoSync";
 import TotalBalance from "@/app/ui/plaid/TotalBalance";
-import { useFinance } from "@/lib/hooks/useFinance";
+
 import { aggregateTransactions } from "@/lib/finance/aggregate";
 import { filterByTime } from "@/lib/finance/filterTime";
-import { useEffect, useState } from "react";
-import DeltaBadge from "@/app/ui/DeltaBadge";
-import BudgetBadge from "@/app/ui/BudgetBadge";
-import UsernameDisplay from "@/app/ui/UsernameDisplay";
-import { Link } from "lucide-react";
+import { useFinance } from "@/lib/hooks/useFinance";
+
 
 export default function Dashboard() {
+    {/* Variables and data for the front */}
     const { get, loading, transactions } = useFinance();
 
     useEffect(() => {
     if (transactions.length === 0) return;
         const debug = aggregateTransactions(filterByTime(transactions, "month"));
-        console.log("📊 full aggregated tree:", JSON.stringify(debug, null, 2));
+        console.log("full aggregated tree:", JSON.stringify(debug, null, 2));
     }, [transactions]);
 
     const [barDate, setBarDate] = useState({
@@ -38,17 +41,37 @@ export default function Dashboard() {
     });
 
     const barChartData = useMemo(() => [
-        { label: "Income", value: get("income", barDate) },
-        { label: "Spent",  value: get("spending", barDate) },
+        {
+            label: "Budget",
+            value: 100,
+        },
+        { 
+            label: "Income", 
+            value: get("income", barDate) 
+        },
+        { 
+            label: "Spent",  
+            value: get("spending", barDate) 
+        },
     ], [get, barDate.month, barDate.year]);
 
     const pieChartData = useMemo(() => [
-        { label: "Bills",    value: get("bills", pieDate) },
-        { label: "Food",     value: get("expenses.food", pieDate) },
-        { label: "Shopping", value: get("expenses.shopping", pieDate) },
+        { 
+            label: "Bills",    
+            value: get("bills", pieDate) 
+        },
+        { 
+            label: "Food",     
+            value: get("expenses.food", pieDate) 
+        },
+        { 
+            label: "Shopping", value: 
+            get("expenses.shopping", pieDate) 
+        },
     ], [get, pieDate.month, pieDate.year]); 
     
 
+    {/* Actual page content */}
     return (
         <>
             <AutoSync />
@@ -58,16 +81,11 @@ export default function Dashboard() {
                     Welcome back, <UsernameDisplay />
                 </span>
             </SubTitle>
-            <Wrapper className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-6">
+            <Wrapper className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-8 mt-6">
                 <Card>
                     <CardTitle title="Account Balance" className="text-lg text-secondary/80" />
                     <p className="text-[2rem]">
                         <TotalBalance breakdown />
-                    </p>
-                    <p className="flex items-center">
-                        <DeltaBadge 
-                        value={get("income", "month") - get("income", "month:previous")} 
-                        suffix=" last month"/>
                     </p>
                 </Card>
                 <Card>
@@ -125,7 +143,7 @@ export default function Dashboard() {
                     <CardTitle title="Recent Transactions" className="text-[2rem]" />
 
                     <Link href="/transactions">
-                    View All
+                        View All
                     </Link>
                 </Card>
                 <Card>
