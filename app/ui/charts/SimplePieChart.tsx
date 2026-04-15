@@ -33,7 +33,11 @@ export default function SimplePieChart({ data, isAnimationActive = true }: Simpl
         .map(d => resolved.find(r => r.label === d.label))
         .filter(Boolean) as typeof resolved;
 
-    const pieData = ordered.map((e) => ({ name: e.label, value: e.value }));
+    const filtered = ordered.filter((e) => e.value > 0);
+
+    const total = filtered.reduce((sum, e) => sum + e.value, 0);
+
+    const pieData = filtered.map((e) => ({ name: e.label, value: e.value }));
 
     return (
         <ResponsiveContainer width="100%" height="100%">
@@ -45,7 +49,7 @@ export default function SimplePieChart({ data, isAnimationActive = true }: Simpl
                     dataKey="value"
                     isAnimationActive={isAnimationActive}
                 >
-                    {ordered.map((entry, index) => (
+                    {filtered.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                 </Pie>
@@ -53,14 +57,14 @@ export default function SimplePieChart({ data, isAnimationActive = true }: Simpl
                 <Legend
                     content={() => (
                         <div className="flex gap-4 justify-center mt-2">
-                            {ordered.map((entry) => (
+                            {filtered.map((entry) => (
                                 <div key={entry.label} className="flex items-center gap-2">
                                     <div
                                         className="w-3 h-3 rounded-sm"
                                         style={{ backgroundColor: entry.color }}
                                     />
                                     <span className="text-sm text-white/80">
-                                        {entry.label}
+                                        {entry.label} {((entry.value / total) * 100).toFixed(0)}%
                                     </span>
                                 </div>
                             ))}
