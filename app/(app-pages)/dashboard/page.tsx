@@ -15,20 +15,13 @@ import SimplePieChart from "@/app/ui/charts/SimplePieChart";
 import AutoSync from "@/app/ui/plaid/AutoSync";
 import TotalBalance from "@/app/ui/plaid/TotalBalance";
 
-import { aggregateTransactions } from "@/lib/finance/aggregate";
-import { filterByTime } from "@/lib/finance/filterTime";
 import { useFinance } from "@/lib/hooks/useFinance";
+import { CATEGORY_RULES, getChildKeys } from "@/lib/finance/categories";
 
 
 export default function Dashboard() {
     {/* Variables and data for the front */}
     const { get, loading, transactions } = useFinance();
-
-    useEffect(() => {
-    if (transactions.length === 0) return;
-        const debug = aggregateTransactions(filterByTime(transactions, "month"));
-        console.log("full aggregated tree:", JSON.stringify(debug, null, 2));
-    }, [transactions]);
 
     const [barDate, setBarDate] = useState({
         month: new Date().getMonth() + 1,
@@ -42,7 +35,7 @@ export default function Dashboard() {
 
     const barChartData = useMemo(() => [
         { 
-            label: "Income", 
+            label: "Income",
             value: get("income", barDate) 
         },
         {
@@ -55,20 +48,19 @@ export default function Dashboard() {
         },
     ], [get, barDate.month, barDate.year]);
 
-    const pieChartData = useMemo(() => [
-        { 
-            label: "Bills",    
-            value: get("bills", pieDate) 
-        },
-        { 
-            label: "Food",     
-            value: get("expenses.food", pieDate) 
-        },
-        { 
-            label: "Shopping", value: 
-            get("expenses.shopping", pieDate) 
-        },
-    ], [get, pieDate.month, pieDate.year]); 
+    const pieChartData = useMemo(() =>
+        getChildKeys("expenses").map((key) => ({
+            label: key.split(".").pop()!,
+            value: get(key, pieDate),
+        })),
+    [get, pieDate.month, pieDate.year]);
+
+    const debtData = useMemo(() =>
+        getChildKeys("debt").map((key) => ({
+            label: key.split(".").pop()!,
+            value: get(key, pieDate),
+        })),
+    [get, pieDate.month, pieDate.year]);
     
 
     {/* Actual page content */}
@@ -135,7 +127,7 @@ export default function Dashboard() {
                     <Wrapper className="flex items-center justify-center">
                         {/* Fixed size wrapper so ResponsiveContainer has something to measure */}
                         <div style={{ width: "300px", height: "300px" }}>
-                            <SimplePieChart data={pieChartData} />
+                            <SimplePieChart data={[...pieChartData, ...debtData]} />
                         </div>
                     </Wrapper>
                 </Card>
