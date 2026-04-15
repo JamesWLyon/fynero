@@ -16,27 +16,20 @@ import AutoSync from "@/app/ui/plaid/AutoSync";
 import TotalBalance from "@/app/ui/plaid/TotalBalance";
 
 import { useFinance } from "@/lib/hooks/useFinance";
-import { getChildKeys } from "@/lib/finance/categories";
 
 export default function Dashboard() {
     const { get, loading } = useFinance();
 
-    const [barDate, setBarDate] = useState({
+    const [selectedDate, setSelectedDate] = useState({
         month: new Date().getMonth() + 1,
         year: new Date().getFullYear(),
     });
 
-    const [pieDate, setPieDate] = useState({
-        month: new Date().getMonth() + 1,
-        year: new Date().getFullYear(),
-    });
-
-    // get month data once
     const monthData = useMemo(() => {
         const income = get("income", "month");
         const spent = get("spent", "month");
         const prevSpent = get("spent", "month:previous");
-        const bills = get("bills", "month");
+        const bills = get("spent.expenses.bills", "month");
 
         return {
             income,
@@ -47,22 +40,53 @@ export default function Dashboard() {
         };
     }, [get]);
 
-    // bar chart data
     const barChartData = useMemo(() => [
-        { label: "Income", value: get("income", barDate) },
-        { label: "Budget", value: 100 },
-        { label: "Spent", value: get("spent", barDate) },
-    ], [get, barDate.month, barDate.year]);
+        {
+            label: "Income",
+            value: get("income", selectedDate),
+        },
+        {
+            label: "Budget",
+            value: 100,
+        },
+        {
+            label: "Spent",
+            value: get("spent", selectedDate),
+        },
+    ], [get, selectedDate]);
 
-    // pie chart data
     const pieChartData = useMemo(() => {
-        const keys = getChildKeys("spent");
+        const keys = [
+            "spent.savings",
+            "spent.debt",
+            "spent.expenses.bills",
+            "spent.expenses.food",
+            "spent.expenses.shopping",
+            "spent.expenses.transport",
+            "spent.expenses.personal",
+            "spent.expenses.other",
+        ];
 
         return keys.map((key) => ({
             label: key.split(".").pop()!,
-            value: get(key, pieDate),
+            value: get(key, selectedDate),
         }));
-    }, [get, pieDate.month, pieDate.year]);
+    }, [get, selectedDate]);
+
+    if (loading) {
+        return (
+            <>
+                <AutoSync />
+                <Title title="Dashboard" />
+                <SubTitle>
+                    <span>
+                        Welcome back, <UsernameDisplay />
+                    </span>
+                </SubTitle>
+                <p>Loading...</p>
+            </>
+        );
+    }
 
     return (
         <>
@@ -75,7 +99,6 @@ export default function Dashboard() {
                 </span>
             </SubTitle>
 
-            {/* TOP CARDS */}
             <Wrapper className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-8 mt-6">
                 <Card>
                     <CardTitle title="Account Balance" className="text-lg text-secondary/80" />
@@ -88,9 +111,9 @@ export default function Dashboard() {
                     <CardTitle title="Monthly spent" className="text-lg text-secondary/80" />
                     <p className="text-[2rem]">${monthData.spent}</p>
                     <p className="flex items-center">
-                        <DeltaBadge 
-                            value={monthData.spent - monthData.prevSpent} 
-                            suffix=" last month" 
+                        <DeltaBadge
+                            value={monthData.spent - monthData.prevSpent}
+                            suffix=" last month"
                         />
                     </p>
                 </Card>
@@ -116,15 +139,19 @@ export default function Dashboard() {
                 </Card>
             </Wrapper>
 
-            {/* CHARTS */}
             <Wrapper className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6">
                 <Card>
-                    <Wrapper className="flex">
+                    <Wrapper className="flex mb-8">
                         <CardTitle title="Income vs Expenses" className="text-[2rem]" />
-                        <MonthYearDropdown onChange={setBarDate} className="ml-auto" />
+                        <MonthYearDropdown
+                            linked
+                            value={selectedDate}
+                            onChange={setSelectedDate}
+                            className="ml-auto"
+                        />
                     </Wrapper>
 
-                    <div style={{ width: "100%", height: "300px" }}>
+                    <div className="w-full max-w-[720px] h-[25rem]">
                         <SimpleBarChart data={barChartData} />
                     </div>
                 </Card>
@@ -132,11 +159,16 @@ export default function Dashboard() {
                 <Card>
                     <Wrapper className="flex">
                         <CardTitle title="Spent Breakdown" className="text-[2rem]" />
-                        <MonthYearDropdown onChange={setPieDate} className="ml-auto" />
+                        <MonthYearDropdown
+                            linked
+                            value={selectedDate}
+                            onChange={setSelectedDate}
+                            className="ml-auto"
+                        />
                     </Wrapper>
 
                     <Wrapper className="flex items-center justify-center">
-                        <div style={{ width: "300px", height: "300px" }}>
+                        <div className="w-full max-w-[720px] h-[25rem]">
                             <SimplePieChart data={pieChartData} />
                         </div>
                     </Wrapper>
