@@ -108,7 +108,7 @@ export default function Dashboard() {
                 </Card>
 
                 <Card>
-                    <CardTitle title="Monthly Spending" className="text-lg text-secondary/80" />
+                    <CardTitle title="Current Month Spending" className="text-lg text-secondary/80" />
                     <p className="text-[2rem]">${monthData.spent}</p>
                     <p className="flex items-center">
                         <DeltaBadge
@@ -119,7 +119,7 @@ export default function Dashboard() {
                 </Card>
 
                 <Card>
-                    <CardTitle title="Budget Left" className="text-lg text-secondary/80" />
+                    <CardTitle title="Budget Left of Current Month" className="text-lg text-secondary/80" />
                     <p className="text-[2rem]">${monthData.budgetLeft.toFixed(2)}</p>
                     <p>
                         <BudgetBadge
