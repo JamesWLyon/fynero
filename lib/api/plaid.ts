@@ -7,5 +7,5 @@ export async function getBalance() {
 
   const data = await res.json();
 
-  return data; // 👈 important (don’t just console.log)
+  return data;
 }

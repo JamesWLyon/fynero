@@ -1,20 +1,8 @@
-import { aggregateTransactions } from "./aggregate";
-import { filterByTime } from "./filterTime";
-import { TimeFilter } from "./TimeFilter";
-
-export function getValue(
-    transactions: any[],
-    path: string,
-    timeQuery: TimeFilter = "all"
-): number {
-    if (!transactions || transactions.length === 0) return 0;
-
-    const filtered = filterByTime(transactions, timeQuery);
-
-    const data = aggregateTransactions(filtered);
+export function getValue(data: any, path: string): number {
+    if (!data) return 0;
 
     const keys = path.split(".");
-    let current: any = data;
+    let current = data;
 
     for (const key of keys) {
         if (current?.[key] === undefined) return 0;

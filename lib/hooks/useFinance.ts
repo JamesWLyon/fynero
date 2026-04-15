@@ -1,7 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
+
+import { aggregateTransactions } from "@/lib/finance/aggregate";
+import { filterByTime } from "@/lib/finance/filterTime";
 import { getValue } from "@/lib/finance/getValue";
 import { TimeFilter } from "@/lib/finance/TimeFilter";
 
@@ -29,11 +32,27 @@ export function useFinance() {
         load();
     }, []);
 
+    // aggregate once for all-time
+    const aggregatedAll = useMemo(() => {
+        return aggregateTransactions(transactions);
+    }, [transactions]);
+
+    // getter function
+    const get = (path: string, time?: TimeFilter) => {
+        if (!time || time === "all") {
+            return getValue(aggregatedAll, path);
+        }
+
+        const filtered = filterByTime(transactions, time);
+        const aggregated = aggregateTransactions(filtered);
+
+        return getValue(aggregated, path);
+    };
+
     return {
         transactions,
         loading,
-
-        get: (path: string, time?: TimeFilter) =>
-            getValue(transactions, path, time),
+        aggregatedAll,
+        get,
     };
 }
