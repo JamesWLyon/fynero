@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Link } from "lucide-react";
+import Link from "next/link";
 
 import Card from "@/app/ui/Card";
 import DeltaBadge from "@/app/ui/DeltaBadge";
@@ -185,7 +185,19 @@ export default function Dashboard() {
                         showIcon
                         className=""
                     />
-                    <Link href="/transactions"></Link>
+
+                    <div className="mt-4 flex justify-end">
+                        <Link
+                            href="/transactions"
+                            className="
+                                inline-flex items-center rounded-xl border border-white/10
+                                bg-white/[0.03] px-4 py-2 text-sm text-white/80 transition
+                                hover:bg-white/[0.05] hover:text-white
+                            "
+                        >
+                            View All
+                        </Link>
+                    </div>
                 </Card>
 
                 <Card>
