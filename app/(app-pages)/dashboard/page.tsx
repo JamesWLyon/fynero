@@ -60,12 +60,7 @@ export default function Dashboard() {
         const keys = [
             "spent.savings",
             "spent.debt",
-            "spent.expenses.bills",
-            "spent.expenses.food",
-            "spent.expenses.shopping",
-            "spent.expenses.transport",
-            "spent.expenses.personal",
-            "spent.expenses.other",
+            "spent.expenses",
         ];
 
         return keys.map((key) => ({

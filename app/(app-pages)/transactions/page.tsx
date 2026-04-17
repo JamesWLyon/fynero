@@ -36,9 +36,9 @@ export default function Transactions() {
     if (loading) {
         return (
             <>
-                <Title title="Dashboard" />
+                <Title title="Transactions" />
                 <SubTitle>
-                    <span>You spent a total of ${transactionData.spent}</span>
+                    <span>Filter through your past spending!</span>
                 </SubTitle>
                 <p>Loading...</p>
             </>
@@ -47,10 +47,10 @@ export default function Transactions() {
 
     return (
         <>
-            <Title title="Dashboard" />
+            <Title title="Transactions" />
 
             <SubTitle className="mb-6">
-                <span>You spent a total of ${transactionData.spent} this month!</span>
+                <span>Filter through your past spending!</span>
             </SubTitle>
 
             <Wrapper className="flex flex-col justify-center items-center">
