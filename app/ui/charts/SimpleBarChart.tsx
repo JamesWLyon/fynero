@@ -31,19 +31,23 @@ const SimpleBarChart = ({ data }: SimpleBarChartProps) => {
                 <YAxis />
                 <Tooltip />
                 <Legend
+                    verticalAlign="bottom"
+                    height={1}
                     content={() => (
-                        <div className="flex gap-4 justify-center mt-2">
-                            {ordered.map((entry) => (
-                                <div key={entry.label} className="flex items-center gap-2">
-                                    <div
-                                        className="w-3 h-3 rounded-sm"
-                                        style={{ backgroundColor: entry.color }}
-                                    />
-                                    <span className="text-sm text-white/80">
-                                        {entry.label}
-                                    </span>
-                                </div>
-                            ))}
+                        <div className="w-full px-2">
+                             <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
+                                {ordered.map((entry) => (
+                                    <div key={entry.label} className="flex items-center gap-2">
+                                        <div
+                                            className="w-3 h-3 rounded-sm shrink-0"
+                                            style={{ backgroundColor: entry.color }}
+                                        />
+                                        <span className="text-sm text-white/80">
+                                            {entry.label}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     )}
                 />
