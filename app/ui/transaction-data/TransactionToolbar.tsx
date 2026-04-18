@@ -147,7 +147,7 @@ export default function TransactionToolbar({
     return (
         <div
             className={[
-                "w-full rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-[2.5px]",
+                "w-full rounded-2xl backdrop-blur-[0px]",
                 "p-3 sm:p-4",
                 className,
             ].join(" ")}
