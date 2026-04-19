@@ -342,7 +342,7 @@ export default function ShowTransactions({
                 </div>
 
                 {/* Mobile layout */}
-                <div className="md:hidden">
+                <div className="md:hidden overflow-x-hidden">
                     <div className="flex flex-col">
                         {displayedTransactions.map((tx) => {
                             const name = getDisplayName(tx);
@@ -381,7 +381,7 @@ export default function ShowTransactions({
                                                 </p>
 
                                                 {showAmount && (
-                                                    <p className={`shrink-0 text-right font-medium ${amountColor}`}>
+                                                    <p className={`shrink-0 text-right font-medium max-w-[30%] truncate ${amountColor}`}>
                                                         {amountPrefix}${Math.abs(rawAmount).toFixed(2)}
                                                     </p>
                                                 )}
@@ -396,7 +396,7 @@ export default function ShowTransactions({
 
                                                 {showCategory && (
                                                     <span
-                                                        className="inline-flex items-center rounded-md px-2.5 py-1 text-sm text-white border max-w-full"
+                                                        className="inline-flex items-center rounded-md px-2.5 py-1 text-sm text-white border truncate max-w-[160px]"
                                                         style={{
                                                             backgroundColor: categoryBg,
                                                             borderColor: categoryColor,
