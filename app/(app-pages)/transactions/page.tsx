@@ -54,7 +54,7 @@ export default function Transactions() {
             </SubTitle>
 
             <Wrapper className="flex flex-col justify-center items-center">
-                <div className="w-[90%] flex flex-col gap-4">
+                <div className="w-[85%] lg:w-[90%] flex flex-col gap-4">
                     <TransactionToolbar
                         transactions={transactions}
                         filters={filters}
