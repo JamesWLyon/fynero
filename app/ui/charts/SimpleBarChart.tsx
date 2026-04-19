@@ -2,7 +2,6 @@
 
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { useChartData, type ChartDataEntry } from "@/app/config/useChartData";
-import type { LegendProps } from "recharts";
 
 interface SimpleBarChartProps {
     data: ChartDataEntry[];
