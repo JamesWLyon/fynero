@@ -40,11 +40,6 @@ Real-time totals for:
 - Savings
 - Debt
 
-Dynamic queries:
-```
-data.expenses.bills.subscriptions
-```
-
 ---
 
 ### 📈 Dashboard Ready
@@ -89,18 +84,6 @@ Designed for:
   - Transactions API (`/transactions/sync`)
   - Accounts API (`/accounts/balance/get`)
   - Link API (bank connection)
-
----
-
-## 🧠 Example Usage
-
-```tsx
-const { get } = useFinance();
-
-<p>{get("expenses.food", "month")}</p>
-<p>{get("expenses.bills.subscriptions", "month")}</p>
-<p>{get("income", "year")}</p>
-```
 
 ---
 
