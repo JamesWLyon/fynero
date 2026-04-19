@@ -8,7 +8,6 @@ interface SimpleBarChartProps {
     data: ChartDataEntry[];
 }
 
-// SimpleBarChart.tsx
 const SimpleBarChart = ({ data }: SimpleBarChartProps) => {
     const resolved = useChartData(data);
     const ordered = data
