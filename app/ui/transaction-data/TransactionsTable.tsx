@@ -204,18 +204,11 @@ export default function ShowTransactions({
     const [currentPage, setCurrentPage] = useState(1);
 
     const sortedTransactions = useMemo(() => {
-        const filtered = transactions.filter((tx) => {
+        return transactions.filter((tx) => {
             const type = (tx.type || "").toLowerCase();
             return type !== "income";
         });
-
-        return [...filtered].sort((a, b) => {
-            const aTime = new Date(a.created_at || a.date || 0).getTime();
-            const bTime = new Date(b.created_at || b.date || 0).getTime();
-
-            return newestFirst ? bTime - aTime : aTime - bTime;
-        });
-    }, [transactions, newestFirst]);
+    }, [transactions]);
 
     const safeLimit = Math.max(1, limit);
     const totalPages = pages

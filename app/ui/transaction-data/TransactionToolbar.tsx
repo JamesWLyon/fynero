@@ -7,6 +7,7 @@ import {
     Filter,
     RotateCcw,
     Search,
+    Check,
 } from "lucide-react";
 import {
     type Transaction,
@@ -39,6 +40,109 @@ function sortAlpha(values: string[]) {
     return [...values].sort((a, b) => a.localeCompare(b));
 }
 
+// ─── Reusable custom listbox ───────────────────────────────────────────────
+
+type ListboxOption = { value: string; label: string };
+
+type ListboxProps = {
+    value: string;
+    options: ListboxOption[];
+    onChange: (value: string) => void;
+    placeholder?: string;
+};
+
+function Listbox({ value, options, onChange, placeholder }: ListboxProps) {
+    const [open, setOpen] = useState(false);
+    const ref = useRef<HTMLDivElement>(null);
+
+    const selectedLabel =
+        options.find((o) => o.value === value)?.label ?? placeholder ?? "";
+
+    useEffect(() => {
+        function handleClickOutside(e: MouseEvent) {
+            if (ref.current && !ref.current.contains(e.target as Node)) {
+                setOpen(false);
+            }
+        }
+        function handleEscape(e: KeyboardEvent) {
+            if (e.key === "Escape") setOpen(false);
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        document.addEventListener("keydown", handleEscape);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+            document.removeEventListener("keydown", handleEscape);
+        };
+    }, []);
+
+    return (
+        <div ref={ref} className="relative min-w-0 w-full">
+            <button
+                type="button"
+                onClick={() => setOpen((p) => !p)}
+                className="
+                    w-full flex items-center justify-between gap-2 rounded-xl border border-white/10
+                    bg-white/[0.03] px-4 py-3 text-white transition
+                    hover:bg-white/[0.05] focus:outline-none focus:border-white/20
+                "
+            >
+                <span className="truncate text-sm">
+                    {value
+                        ? <span className="text-white">{selectedLabel}</span>
+                        : <span className="text-white/45">{placeholder}</span>
+                    }
+                </span>
+                <ChevronDown
+                    size={16}
+                    className={`shrink-0 text-white/50 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+                />
+            </button>
+
+            {open && (
+                <div
+                    className="
+                        absolute left-0 top-[calc(100%+0.375rem)] z-50 w-full
+                        overflow-hidden rounded-xl border border-white/10
+                        bg-[#0f172a]/95 shadow-2xl backdrop-blur-lg
+                    "
+                >
+                    <div className="max-h-52 overflow-y-auto">
+                        {options.map((opt) => {
+                            const isSelected = opt.value === value;
+                            return (
+                                <button
+                                    key={opt.value}
+                                    type="button"
+                                    onClick={() => {
+                                        onChange(opt.value);
+                                        setOpen(false);
+                                    }}
+                                    className={`
+                                        flex w-full items-center justify-between gap-2
+                                        px-4 py-2.5 text-left text-sm transition
+                                        hover:bg-white/[0.07]
+                                        ${isSelected
+                                            ? "bg-white/[0.06] text-white"
+                                            : "text-white/70 hover:text-white"
+                                        }
+                                    `}
+                                >
+                                    <span>{opt.label}</span>
+                                    {isSelected && (
+                                        <Check size={14} className="shrink-0 text-white/60" />
+                                    )}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
+
+// ─── Main toolbar ──────────────────────────────────────────────────────────
+
 export default function TransactionToolbar({
     transactions,
     filters,
@@ -60,21 +164,13 @@ export default function TransactionToolbar({
 
     const categoryOptions = useMemo(() => {
         const values = new Set<string>();
-
-        for (const tx of transactions) {
-            values.add(getDisplayCategory(tx));
-        }
-
+        for (const tx of transactions) values.add(getDisplayCategory(tx));
         return sortAlpha([...values]);
     }, [transactions]);
 
     const accountOptions = useMemo(() => {
         const values = new Set<string>();
-
-        for (const tx of transactions) {
-            values.add(getDisplayAccount(tx));
-        }
-
+        for (const tx of transactions) values.add(getDisplayAccount(tx));
         return sortAlpha([...values]);
     }, [transactions]);
 
@@ -94,26 +190,21 @@ export default function TransactionToolbar({
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
             const target = event.target as Node;
-
             if (exportRef.current && !exportRef.current.contains(target)) {
                 setExportOpen(false);
             }
-
             if (filterRef.current && !filterRef.current.contains(target)) {
                 setFilterOpen(false);
             }
         }
-
         function handleEscape(event: KeyboardEvent) {
             if (event.key === "Escape") {
                 setExportOpen(false);
                 setFilterOpen(false);
             }
         }
-
         document.addEventListener("mousedown", handleClickOutside);
         document.addEventListener("keydown", handleEscape);
-
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
             document.removeEventListener("keydown", handleEscape);
@@ -124,10 +215,7 @@ export default function TransactionToolbar({
         key: K,
         value: TransactionToolbarFilters[K]
     ) {
-        onChange({
-            ...filters,
-            [key]: value,
-        });
+        onChange({ ...filters, [key]: value });
     }
 
     function clearFilters() {
@@ -144,6 +232,22 @@ export default function TransactionToolbar({
         setExportOpen(false);
     }
 
+    // Build listbox option arrays
+    const categoryListboxOptions: ListboxOption[] = [
+        { value: "", label: allCategoriesLabel },
+        ...categoryOptions.map((c) => ({ value: c, label: c })),
+    ];
+
+    const accountListboxOptions: ListboxOption[] = [
+        { value: "", label: allAccountsLabel },
+        ...accountOptions.map((a) => ({ value: a, label: a })),
+    ];
+
+    const sortListboxOptions: ListboxOption[] = [
+        { value: "newest", label: "Newest to Oldest" },
+        { value: "oldest", label: "Oldest to Newest" },
+    ];
+
     return (
         <div
             className={[
@@ -154,6 +258,7 @@ export default function TransactionToolbar({
         >
             <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
 
+                {/* Search */}
                 <div className="relative min-w-0 flex-1">
                     <Search
                         size={18}
@@ -175,10 +280,9 @@ export default function TransactionToolbar({
                 </div>
 
                 <div className="flex gap-3">
-                    <div
-                        ref={filterRef}
-                        className="relative w-full"
-                    >
+
+                    {/* Filter dropdown */}
+                    <div ref={filterRef} className="relative w-full">
                         <button
                             type="button"
                             onClick={() => {
@@ -205,7 +309,7 @@ export default function TransactionToolbar({
                         {filterOpen && (
                             <div
                                 className="
-                                    fixed right-0 top-[calc(100%+0.5rem)] z-55 w-full overflow-hidden rounded-2xl
+                                    fixed right-0 top-[calc(100%+0.5rem)] z-55 w-full rounded-2xl
                                     border border-white/10 bg-[#0f172a]/95 shadow-2xl backdrop-blur-lg
                                     lg:w-[720px] max-w-[calc(100vw-2rem)]
                                 "
@@ -237,17 +341,13 @@ export default function TransactionToolbar({
                                 </div>
 
                                 <div className="grid gap-4 p-4 lg:grid-cols-2">
+
+                                    {/* Date Range */}
                                     <div className="lg:col-span-2">
                                         <p className="mb-2 text-sm font-medium text-white/90">
                                             Date Range
                                         </p>
-
-                                        <div
-                                            className="
-                                                overflow-hidden rounded-xl border border-white/10
-                                                bg-white/[0.03]
-                                            "
-                                        >
+                                        <div className="overflow-hidden rounded-xl border border-white/10 bg-white/[0.03]">
                                             <div className="grid gap-0 sm:grid-cols-[1fr_auto_1fr]">
                                                 <div className="px-4 py-3">
                                                     <label className="mb-2 block text-xs uppercase tracking-wide text-white/50">
@@ -259,22 +359,12 @@ export default function TransactionToolbar({
                                                         onChange={(e) =>
                                                             updateFilter("startDate", e.target.value)
                                                         }
-                                                        className="
-                                                            w-full bg-transparent text-white outline-none
-                                                        "
+                                                        className="w-full bg-transparent text-white outline-none"
                                                     />
                                                 </div>
-
-                                                <div
-                                                    className="
-                                                        flex items-center justify-center border-y border-white/10 px-3 py-2
-                                                        text-xs uppercase tracking-wide text-white/40
-                                                        sm:border-x sm:border-y-0
-                                                    "
-                                                >
+                                                <div className="flex items-center justify-center border-y border-white/10 px-3 py-2 text-xs uppercase tracking-wide text-white/40 sm:border-x sm:border-y-0">
                                                     to
                                                 </div>
-
                                                 <div className="px-4 py-3">
                                                     <label className="mb-2 block text-xs uppercase tracking-wide text-white/50">
                                                         End
@@ -285,121 +375,60 @@ export default function TransactionToolbar({
                                                         onChange={(e) =>
                                                             updateFilter("endDate", e.target.value)
                                                         }
-                                                        className="
-                                                            w-full bg-transparent text-white outline-none
-                                                        "
+                                                        className="w-full bg-transparent text-white outline-none"
                                                     />
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
+                                    {/* Category */}
                                     <div>
                                         <label className="mb-2 block text-sm font-medium text-white/90">
                                             Category
                                         </label>
-                                        <div className="relative min-w-0">
-                                            <select
-                                                value={filters.category}
-                                                onChange={(e) =>
-                                                    updateFilter("category", e.target.value)
-                                                }
-                                                className="
-                                                    w-full appearance-none rounded-xl border border-white/10
-                                                    bg-white/[0.03] px-4 py-3 pr-10
-                                                    text-white outline-none transition
-                                                    focus:border-white/20 focus:bg-white/[0.05]
-                                                "
-                                            >
-                                                <option value="">{allCategoriesLabel}</option>
-                                                {categoryOptions.map((category) => (
-                                                    <option key={category} value={category}>
-                                                        {category}
-                                                    </option>
-                                                ))}
-                                            </select>
-
-                                            <ChevronDown
-                                                size={18}
-                                                className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-white/50"
-                                            />
-                                        </div>
+                                        <Listbox
+                                            value={filters.category}
+                                            options={categoryListboxOptions}
+                                            onChange={(v) => updateFilter("category", v)}
+                                            placeholder={allCategoriesLabel}
+                                        />
                                     </div>
 
+                                    {/* Bank Account */}
                                     <div>
                                         <label className="mb-2 block text-sm font-medium text-white/90">
                                             Bank Account
                                         </label>
-                                        <div className="relative min-w-0">
-                                            <select
-                                                value={filters.account}
-                                                onChange={(e) =>
-                                                    updateFilter("account", e.target.value)
-                                                }
-                                                className="
-                                                    w-full appearance-none rounded-xl border border-white/10
-                                                    bg-white/[0.03] px-4 py-3 pr-10
-                                                    text-white outline-none transition
-                                                    focus:border-white/20 focus:bg-white/[0.05]
-                                                "
-                                            >
-                                                <option value="">{allAccountsLabel}</option>
-                                                {accountOptions.map((account) => (
-                                                    <option key={account} value={account}>
-                                                        {account}
-                                                    </option>
-                                                ))}
-                                            </select>
-
-                                            <ChevronDown
-                                                size={18}
-                                                className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-white/50"
-                                            />
-                                        </div>
+                                        <Listbox
+                                            value={filters.account}
+                                            options={accountListboxOptions}
+                                            onChange={(v) => updateFilter("account", v)}
+                                            placeholder={allAccountsLabel}
+                                        />
                                     </div>
 
+                                    {/* Sort Order */}
                                     <div>
                                         <label className="mb-2 block text-sm font-medium text-white/90">
                                             Sort Order
                                         </label>
-                                        <div className="relative min-w-0">
-                                            <select
-                                                value={filters.newestFirst ? "newest" : "oldest"}
-                                                onChange={(e) =>
-                                                    updateFilter(
-                                                        "newestFirst",
-                                                        e.target.value === "newest"
-                                                    )
-                                                }
-                                                className="
-                                                    w-full appearance-none rounded-xl border border-white/10
-                                                    bg-white/[0.03] px-4 py-3 pr-10
-                                                    text-white outline-none transition
-                                                    focus:border-white/20 focus:bg-white/[0.05]
-                                                "
-                                            >
-                                                <option value="newest">Newest to Oldest</option>
-                                                <option value="oldest">Oldest to Newest</option>
-                                            </select>
-
-                                            <ChevronDown
-                                                size={18}
-                                                className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-white/50"
-                                            />
-                                        </div>
+                                        <Listbox
+                                            value={filters.newestFirst ? "newest" : "oldest"}
+                                            options={sortListboxOptions}
+                                            onChange={(v) =>
+                                                updateFilter("newestFirst", v === "newest")
+                                            }
+                                            placeholder="Select order"
+                                        />
                                     </div>
 
+                                    {/* Refunds */}
                                     <div>
                                         <label className="mb-2 block text-sm font-medium text-white/90">
                                             Refunds
                                         </label>
-                                        <label
-                                            className="
-                                                inline-flex w-full items-center gap-3 rounded-xl border border-white/10
-                                                bg-white/[0.03] px-4 py-3 text-white cursor-pointer
-                                                transition hover:bg-white/[0.05]
-                                            "
-                                        >
+                                        <label className="inline-flex w-full items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white cursor-pointer transition hover:bg-white/[0.05]">
                                             <input
                                                 type="checkbox"
                                                 checked={filters.includeRefunds}
@@ -414,6 +443,7 @@ export default function TransactionToolbar({
                                         </label>
                                     </div>
 
+                                    {/* Min Amount */}
                                     <div>
                                         <label className="mb-2 block text-sm font-medium text-white/90">
                                             Minimum Amount
@@ -438,6 +468,7 @@ export default function TransactionToolbar({
                                         />
                                     </div>
 
+                                    {/* Max Amount */}
                                     <div>
                                         <label className="mb-2 block text-sm font-medium text-white/90">
                                             Maximum Amount
@@ -465,11 +496,9 @@ export default function TransactionToolbar({
                             </div>
                         )}
                     </div>
-                    
-                    <div
-                        ref={exportRef}
-                        className="relative w-full"
-                    >
+
+                    {/* Export dropdown */}
+                    <div ref={exportRef} className="relative w-full">
                         <button
                             type="button"
                             onClick={() => {
@@ -491,31 +520,19 @@ export default function TransactionToolbar({
                         </button>
 
                         {exportOpen && (
-                            <div
-                                className="
-                                    absolute left-0 top-[calc(100%+0.5rem)] z-30 min-w-full overflow-hidden rounded-xl
-                                    border border-white/10 bg-[#0f172a]/95 shadow-2xl backdrop-blur-lg
-                                "
-                            >
+                            <div className="absolute left-0 top-[calc(100%+0.5rem)] z-30 min-w-full overflow-hidden rounded-xl border border-white/10 bg-[#0f172a]/95 shadow-2xl backdrop-blur-lg">
                                 <button
                                     type="button"
                                     onClick={handleExportCsv}
-                                    className="
-                                        flex w-full items-center gap-2 px-4 py-3 text-left text-white/85 transition
-                                        hover:bg-white/[0.06] hover:text-white
-                                    "
+                                    className="flex w-full items-center gap-2 px-4 py-3 text-left text-white/85 transition hover:bg-white/[0.06] hover:text-white"
                                 >
                                     <Download size={16} />
                                     Export CSV
                                 </button>
-
                                 <button
                                     type="button"
                                     onClick={handleExportPdf}
-                                    className="
-                                        flex w-full items-center gap-2 border-t border-white/10 px-4 py-3
-                                        text-left text-white/85 transition hover:bg-white/[0.06] hover:text-white
-                                    "
+                                    className="flex w-full items-center gap-2 border-t border-white/10 px-4 py-3 text-left text-white/85 transition hover:bg-white/[0.06] hover:text-white"
                                 >
                                     <Download size={16} />
                                     Export PDF
