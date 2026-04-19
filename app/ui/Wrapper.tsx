@@ -5,7 +5,7 @@ type BackgroundName = keyof typeof backgroundVariants;
 
 export default function Wrapper({ children, className }: { children: React.ReactNode; className?: string }) {
     return (
-        <section className={`w-full ${className || ''}`}>
+        <section className={`w-full max-w-full overflow-x-hidden ${className || ''}`}>
             {children}
         </section>
     );

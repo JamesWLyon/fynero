@@ -53,8 +53,8 @@ export default function Transactions() {
                 <span>Filter through your past spending!</span>
             </SubTitle>
 
-            <Wrapper className="w-[100%] flex flex-col justify-center items-center">
-                <div className="w-full lg:w-[90%] flex flex-col gap-4">
+            <Wrapper className="w-full max-w-full overflow-x-hidden flex flex-col justify-center items-center">
+                <div className="w-full lg:w-[90%] max-w-full flex flex-col gap-4 overflow-x-hidden">
                     <TransactionToolbar
                         transactions={transactions}
                         filters={filters}

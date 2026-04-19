@@ -246,7 +246,7 @@ export default function ShowTransactions({
     const pageNumbers = getVisiblePageItems(currentPage, totalPages);
 
     return (
-        <div className={`w-full min-w-0 overflow-x-hidden ${className}`}>
+        <div className={`w-full max-w-full min-w-0 overflow-x-hidden ${className}`}>
             <div className="w-full min-w-0">
                 {/* Desktop / tablet layout */}
                 <div className="hidden md:block">
