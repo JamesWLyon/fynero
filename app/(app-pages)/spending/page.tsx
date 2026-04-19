@@ -158,7 +158,7 @@ export default function Transactions() {
                         </Wrapper>
 
                         <Wrapper className="flex items-center justify-center">
-                            <div className="w-full max-w-[80%] h-[25rem]">
+                            <div className="w-full max-w-[80%] h-[28rem]">
                                 <SimpleBarChart data={barData} />
                             </div>
                         </Wrapper>
