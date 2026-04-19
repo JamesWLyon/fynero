@@ -133,10 +133,9 @@ export default function Navbar() {
 
                 <div className="flex-1 overflow-y-auto px-4 pb-4">
                     <NavContent onNavClick={() => setMobileOpen(false)} />
-                </div>
-
-                <div className="border-t border-accent/10 p-4 bg-primary">
-                    <LogoutButton onLogout={handleLogout} />
+                    <div className="mt-6">
+                        <LogoutButton onLogout={handleLogout} />
+                    </div>
                 </div>
             </aside>
         </>
