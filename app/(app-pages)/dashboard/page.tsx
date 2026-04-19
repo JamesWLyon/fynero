@@ -101,6 +101,9 @@ export default function Dashboard() {
                     <p className="text-[2rem]">
                         <TotalBalance breakdown />
                     </p>
+                    <p className="text-secondary/80">
+                        Click to view more
+                    </p>
                 </Card>
 
                 <Card>

@@ -74,7 +74,13 @@ export default function Transactions() {
     );
 
     const filteredTransactions = useMemo(() => {
-        return filterTransactions(transactions, filters);
+        const filtered = filterTransactions(transactions, filters);
+
+        return [...filtered].sort((a, b) => {
+            const dateA = a.date ? new Date(a.date).getTime() : 0;
+            const dateB = b.date ? new Date(b.date).getTime() : 0;
+            return filters.newestFirst ? dateB - dateA : dateA - dateB;
+        });
     }, [transactions, filters]);
 
     if (loading) {
@@ -102,12 +108,16 @@ export default function Transactions() {
                         <div className={`grid grid-cols-1 md:grid-cols-2 ${sharedStyle}`}>
                             <Card className="w-full">
                                 <CardTitle title="Total Spent" className="text-lg text-secondary/80" />
-                                <p>test</p>
+                                <p className="text-[2rem]">
+                                    $1000
+                                </p>
                             </Card>
 
                             <Card className="w-full">
                                 <CardTitle title="Budget Left" className="text-lg text-secondary/80" />
-                                <p>test</p>
+                                <p className="text-[2rem]">
+                                    $123
+                                </p>
                             </Card>
                         </div>
 
@@ -132,7 +142,13 @@ export default function Transactions() {
 
                     <Card className="w-full flex-1 shrink-0">
                         <Wrapper className="flex mb-12">
-                            <CardTitle title="Budget Left" className="text-lg text-secondary/80" />
+                            <div>
+                                <CardTitle title="Avg. Daily Spending" className="text-[1.5rem]" />
+                                <p className="text-[2rem]">
+                                    $123
+                                </p>
+                            </div>
+
                             <MonthYearDropdown
                                 linked
                                 value={selectedDate}
@@ -150,8 +166,13 @@ export default function Transactions() {
                 </div>
 
                 <Card className="w-full">
-                    <CardTitle title="Total Spent" className="text-lg text-secondary/80" />
-                    <p>test</p>
+                    <TransactionToolbar
+                        transactions={transactions}
+                        exportTransactions={filteredTransactions}
+                        filters={filters}
+                        onChange={setFilters}
+                    />
+                    <ShowTransactions transactions={filteredTransactions} />
                 </Card>
             </Wrapper>
         </>
