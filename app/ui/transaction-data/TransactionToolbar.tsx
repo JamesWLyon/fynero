@@ -40,8 +40,6 @@ function sortAlpha(values: string[]) {
     return [...values].sort((a, b) => a.localeCompare(b));
 }
 
-// ─── Reusable custom listbox ───────────────────────────────────────────────
-
 type ListboxOption = { value: string; label: string };
 
 type ListboxProps = {
@@ -64,11 +62,14 @@ function Listbox({ value, options, onChange, placeholder }: ListboxProps) {
                 setOpen(false);
             }
         }
+
         function handleEscape(e: KeyboardEvent) {
             if (e.key === "Escape") setOpen(false);
         }
+
         document.addEventListener("mousedown", handleClickOutside);
         document.addEventListener("keydown", handleEscape);
+
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
             document.removeEventListener("keydown", handleEscape);
@@ -81,17 +82,19 @@ function Listbox({ value, options, onChange, placeholder }: ListboxProps) {
                 type="button"
                 onClick={() => setOpen((p) => !p)}
                 className="
-                    w-full flex items-center justify-between gap-2 rounded-xl border border-white/10
+                    flex w-full min-w-0 items-center justify-between gap-2 rounded-xl border border-white/10
                     bg-white/[0.03] px-4 py-3 text-white transition
                     hover:bg-white/[0.05] focus:outline-none focus:border-white/20
                 "
             >
-                <span className="truncate text-sm">
-                    {value
-                        ? <span className="text-white">{selectedLabel}</span>
-                        : <span className="text-white/45">{placeholder}</span>
-                    }
+                <span className="min-w-0 truncate text-sm">
+                    {value ? (
+                        <span className="text-white">{selectedLabel}</span>
+                    ) : (
+                        <span className="text-white/45">{placeholder}</span>
+                    )}
                 </span>
+
                 <ChevronDown
                     size={16}
                     className={`shrink-0 text-white/50 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
@@ -109,6 +112,7 @@ function Listbox({ value, options, onChange, placeholder }: ListboxProps) {
                     <div className="max-h-52 overflow-y-auto">
                         {options.map((opt) => {
                             const isSelected = opt.value === value;
+
                             return (
                                 <button
                                     key={opt.value}
@@ -121,13 +125,14 @@ function Listbox({ value, options, onChange, placeholder }: ListboxProps) {
                                         flex w-full items-center justify-between gap-2
                                         px-4 py-2.5 text-left text-sm transition
                                         hover:bg-white/[0.07]
-                                        ${isSelected
-                                            ? "bg-white/[0.06] text-white"
-                                            : "text-white/70 hover:text-white"
+                                        ${
+                                            isSelected
+                                                ? "bg-white/[0.06] text-white"
+                                                : "text-white/70 hover:text-white"
                                         }
                                     `}
                                 >
-                                    <span>{opt.label}</span>
+                                    <span className="min-w-0 truncate">{opt.label}</span>
                                     {isSelected && (
                                         <Check size={14} className="shrink-0 text-white/60" />
                                     )}
@@ -140,8 +145,6 @@ function Listbox({ value, options, onChange, placeholder }: ListboxProps) {
         </div>
     );
 }
-
-// ─── Main toolbar ──────────────────────────────────────────────────────────
 
 export default function TransactionToolbar({
     transactions,
@@ -185,26 +188,31 @@ export default function TransactionToolbar({
         filters.newestFirst !== true ||
         filters.minAmount !== "" ||
         filters.maxAmount !== "" ||
-        filters.includeRefunds !== false;
+        filters.showIncome !== true;
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
             const target = event.target as Node;
+
             if (exportRef.current && !exportRef.current.contains(target)) {
                 setExportOpen(false);
             }
+
             if (filterRef.current && !filterRef.current.contains(target)) {
                 setFilterOpen(false);
             }
         }
+
         function handleEscape(event: KeyboardEvent) {
             if (event.key === "Escape") {
                 setExportOpen(false);
                 setFilterOpen(false);
             }
         }
+
         document.addEventListener("mousedown", handleClickOutside);
         document.addEventListener("keydown", handleEscape);
+
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
             document.removeEventListener("keydown", handleEscape);
@@ -232,7 +240,6 @@ export default function TransactionToolbar({
         setExportOpen(false);
     }
 
-    // Build listbox option arrays
     const categoryListboxOptions: ListboxOption[] = [
         { value: "", label: allCategoriesLabel },
         ...categoryOptions.map((c) => ({ value: c, label: c })),
@@ -251,14 +258,12 @@ export default function TransactionToolbar({
     return (
         <div
             className={[
-                "w-full rounded-2xl backdrop-blur-[0px]",
+                "w-full min-w-0 rounded-2xl backdrop-blur-[0px]",
                 "p-3 sm:p-4",
                 className,
             ].join(" ")}
         >
-            <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
-
-                {/* Search */}
+            <div className="flex min-w-0 flex-col gap-3 lg:flex-row lg:items-center">
                 <div className="relative min-w-0 flex-1">
                     <Search
                         size={18}
@@ -271,7 +276,7 @@ export default function TransactionToolbar({
                         placeholder={searchPlaceholder}
                         className="
                             w-full min-w-0 rounded-xl border border-white/10
-                            bg-white/[0.03] pl-11 pr-4 py-3
+                            bg-white/[0.03] py-3 pl-11 pr-4
                             text-white placeholder:text-white/45
                             outline-none transition
                             focus:border-white/20 focus:bg-white/[0.05]
@@ -279,10 +284,8 @@ export default function TransactionToolbar({
                     />
                 </div>
 
-                <div className="flex gap-3">
-
-                    {/* Filter dropdown */}
-                    <div ref={filterRef} className="relative w-full">
+                <div className="grid min-w-0 grid-cols-2 gap-3 lg:flex lg:min-w-fit lg:flex-none lg:items-center">
+                    <div ref={filterRef} className="relative min-w-0 lg:w-auto">
                         <button
                             type="button"
                             onClick={() => {
@@ -290,33 +293,33 @@ export default function TransactionToolbar({
                                 setExportOpen(false);
                             }}
                             className="
-                                inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/10
+                                inline-flex w-full min-w-0 items-center justify-center gap-2 rounded-xl border border-white/10
                                 bg-white/[0.03] px-4 py-3 text-white transition
                                 hover:bg-white/[0.05] lg:w-auto
                             "
                         >
-                            <Filter size={16} />
-                            Filter
+                            <Filter size={16} className="shrink-0" />
+                            <span className="truncate">Filter</span>
                             {hasActiveFilters && (
-                                <span className="h-2 w-2 rounded-full bg-white/80" />
+                                <span className="h-2 w-2 shrink-0 rounded-full bg-white/80" />
                             )}
                             <ChevronDown
                                 size={16}
-                                className={`transition ${filterOpen ? "rotate-180" : ""}`}
+                                className={`shrink-0 transition ${filterOpen ? "rotate-180" : ""}`}
                             />
                         </button>
 
                         {filterOpen && (
                             <div
                                 className="
-                                    absolute right-0 top-[calc(100%+0.5rem)] z-50 w-screen rounded-2xl
+                                    fixed right-0 top-[calc(100%+0.5rem)] z-55 w-full rounded-2xl
                                     border border-white/10 bg-[#0f172a]/95 shadow-2xl backdrop-blur-lg
                                     lg:w-[720px] max-w-[calc(100vw-2rem)]
                                 "
                             >
-                                <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
-                                    <div>
-                                        <p className="text-sm font-medium text-white">
+                                <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3">
+                                    <div className="min-w-0">
+                                        <p className="truncate text-sm font-medium text-white">
                                             Transaction Filters
                                         </p>
                                         <p className="text-xs text-white/55">
@@ -329,7 +332,7 @@ export default function TransactionToolbar({
                                         onClick={clearFilters}
                                         disabled={!hasActiveFilters}
                                         className="
-                                            inline-flex items-center gap-2 rounded-xl border border-white/10
+                                            inline-flex shrink-0 items-center gap-2 rounded-xl border border-white/10
                                             bg-white/[0.03] px-3 py-2 text-sm text-white/80 transition
                                             hover:bg-white/[0.05] hover:text-white
                                             disabled:cursor-not-allowed disabled:opacity-40
@@ -341,15 +344,14 @@ export default function TransactionToolbar({
                                 </div>
 
                                 <div className="grid gap-4 p-4 lg:grid-cols-2">
-
-                                    {/* Date Range */}
                                     <div className="lg:col-span-2">
                                         <p className="mb-2 text-sm font-medium text-white/90">
                                             Date Range
                                         </p>
+
                                         <div className="overflow-hidden rounded-xl border border-white/10 bg-white/[0.03]">
                                             <div className="grid gap-0 sm:grid-cols-[1fr_auto_1fr]">
-                                                <div className="px-4 py-3">
+                                                <div className="min-w-0 px-4 py-3">
                                                     <label className="mb-2 block text-xs uppercase tracking-wide text-white/50">
                                                         Start
                                                     </label>
@@ -359,13 +361,15 @@ export default function TransactionToolbar({
                                                         onChange={(e) =>
                                                             updateFilter("startDate", e.target.value)
                                                         }
-                                                        className="w-full bg-transparent text-white outline-none"
+                                                        className="w-full min-w-0 bg-transparent text-white outline-none"
                                                     />
                                                 </div>
+
                                                 <div className="flex items-center justify-center border-y border-white/10 px-3 py-2 text-xs uppercase tracking-wide text-white/40 sm:border-x sm:border-y-0">
                                                     to
                                                 </div>
-                                                <div className="px-4 py-3">
+
+                                                <div className="min-w-0 px-4 py-3">
                                                     <label className="mb-2 block text-xs uppercase tracking-wide text-white/50">
                                                         End
                                                     </label>
@@ -375,15 +379,14 @@ export default function TransactionToolbar({
                                                         onChange={(e) =>
                                                             updateFilter("endDate", e.target.value)
                                                         }
-                                                        className="w-full bg-transparent text-white outline-none"
+                                                        className="w-full min-w-0 bg-transparent text-white outline-none"
                                                     />
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {/* Category */}
-                                    <div>
+                                    <div className="min-w-0">
                                         <label className="mb-2 block text-sm font-medium text-white/90">
                                             Category
                                         </label>
@@ -395,8 +398,7 @@ export default function TransactionToolbar({
                                         />
                                     </div>
 
-                                    {/* Bank Account */}
-                                    <div>
+                                    <div className="min-w-0">
                                         <label className="mb-2 block text-sm font-medium text-white/90">
                                             Bank Account
                                         </label>
@@ -408,8 +410,7 @@ export default function TransactionToolbar({
                                         />
                                     </div>
 
-                                    {/* Sort Order */}
-                                    <div>
+                                    <div className="min-w-0">
                                         <label className="mb-2 block text-sm font-medium text-white/90">
                                             Sort Order
                                         </label>
@@ -423,28 +424,46 @@ export default function TransactionToolbar({
                                         />
                                     </div>
 
-                                    {/* Refunds */}
-                                    <div>
+                                    <div className="min-w-0">
                                         <label className="mb-2 block text-sm font-medium text-white/90">
-                                            Refunds
+                                            Income
                                         </label>
-                                        <label className="inline-flex w-full items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white cursor-pointer transition hover:bg-white/[0.05]">
-                                            <input
-                                                type="checkbox"
-                                                checked={filters.includeRefunds}
-                                                onChange={(e) =>
-                                                    updateFilter("includeRefunds", e.target.checked)
-                                                }
-                                                className="h-4 w-4 accent-white"
-                                            />
-                                            <span className="text-sm sm:text-base">
-                                                Include Refunds
+
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                updateFilter("showIncome", !filters.showIncome)
+                                            }
+                                            aria-pressed={filters.showIncome}
+                                            className="
+                                                flex w-full min-w-0 items-center justify-between gap-3 rounded-xl border border-white/10
+                                                bg-white/[0.03] px-4 py-3 text-white transition
+                                                hover:bg-white/[0.05]
+                                            "
+                                        >
+                                            <span className="min-w-0 truncate text-sm sm:text-base">
+                                                Show Income
                                             </span>
-                                        </label>
+
+                                            <span
+                                                className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition ${
+                                                    filters.showIncome
+                                                        ? "bg-white/80"
+                                                        : "bg-white/15"
+                                                }`}
+                                            >
+                                                <span
+                                                    className={`inline-block h-5 w-5 rounded-full bg-[#0f172a] transition-transform ${
+                                                        filters.showIncome
+                                                            ? "translate-x-5"
+                                                            : "translate-x-1"
+                                                    }`}
+                                                />
+                                            </span>
+                                        </button>
                                     </div>
 
-                                    {/* Min Amount */}
-                                    <div>
+                                    <div className="min-w-0">
                                         <label className="mb-2 block text-sm font-medium text-white/90">
                                             Minimum Amount
                                         </label>
@@ -459,7 +478,7 @@ export default function TransactionToolbar({
                                             }
                                             placeholder="Min amount"
                                             className="
-                                                w-full rounded-xl border border-white/10
+                                                w-full min-w-0 rounded-xl border border-white/10
                                                 bg-white/[0.03] px-4 py-3
                                                 text-white placeholder:text-white/45
                                                 outline-none transition
@@ -468,8 +487,7 @@ export default function TransactionToolbar({
                                         />
                                     </div>
 
-                                    {/* Max Amount */}
-                                    <div>
+                                    <div className="min-w-0">
                                         <label className="mb-2 block text-sm font-medium text-white/90">
                                             Maximum Amount
                                         </label>
@@ -484,7 +502,7 @@ export default function TransactionToolbar({
                                             }
                                             placeholder="Max amount"
                                             className="
-                                                w-full rounded-xl border border-white/10
+                                                w-full min-w-0 rounded-xl border border-white/10
                                                 bg-white/[0.03] px-4 py-3
                                                 text-white placeholder:text-white/45
                                                 outline-none transition
@@ -497,8 +515,7 @@ export default function TransactionToolbar({
                         )}
                     </div>
 
-                    {/* Export dropdown */}
-                    <div ref={exportRef} className="relative w-full">
+                    <div ref={exportRef} className="relative min-w-0 lg:w-auto">
                         <button
                             type="button"
                             onClick={() => {
@@ -506,16 +523,16 @@ export default function TransactionToolbar({
                                 setFilterOpen(false);
                             }}
                             className="
-                                inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/10
+                                inline-flex w-full min-w-0 items-center justify-center gap-2 rounded-xl border border-white/10
                                 bg-white/[0.03] px-4 py-3 text-white transition
                                 hover:bg-white/[0.05] lg:w-auto
                             "
                         >
-                            <Download size={16} />
-                            Export
+                            <Download size={16} className="shrink-0" />
+                            <span className="truncate">Export</span>
                             <ChevronDown
                                 size={16}
-                                className={`transition ${exportOpen ? "rotate-180" : ""}`}
+                                className={`shrink-0 transition ${exportOpen ? "rotate-180" : ""}`}
                             />
                         </button>
 
@@ -526,16 +543,17 @@ export default function TransactionToolbar({
                                     onClick={handleExportCsv}
                                     className="flex w-full items-center gap-2 px-4 py-3 text-left text-white/85 transition hover:bg-white/[0.06] hover:text-white"
                                 >
-                                    <Download size={16} />
-                                    Export CSV
+                                    <Download size={16} className="shrink-0" />
+                                    <span className="truncate">Export CSV</span>
                                 </button>
+
                                 <button
                                     type="button"
                                     onClick={handleExportPdf}
                                     className="flex w-full items-center gap-2 border-t border-white/10 px-4 py-3 text-left text-white/85 transition hover:bg-white/[0.06] hover:text-white"
                                 >
-                                    <Download size={16} />
-                                    Export PDF
+                                    <Download size={16} className="shrink-0" />
+                                    <span className="truncate">Export PDF</span>
                                 </button>
                             </div>
                         )}
