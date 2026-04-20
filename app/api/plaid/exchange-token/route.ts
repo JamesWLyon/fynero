@@ -18,7 +18,7 @@ export async function POST(req: Request) {
   try {
     const { public_token } = await req.json();
 
-    // 🥇 Exchange public_token → access_token
+    // Exchange public_token → access_token
     const response = await client.itemPublicTokenExchange({
       public_token,
     });
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
     const access_token = response.data.access_token;
     const item_id = response.data.item_id;
 
-    // 🥈 Get logged-in user
+    // Get logged-in user
     const supabase = await createClient();
     const {
       data: { user },
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No user" }, { status: 401 });
     }
 
-    // 🥉 Save to DB
+    // Save to DB
     const { error } = await supabase.from("plaid_items").insert({
       user_id: user.id,
       access_token,

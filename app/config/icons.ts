@@ -12,6 +12,7 @@ import {
     MoveRight,
     ChevronUp,
     ChevronDown,
+    Pencil,
 } from 'lucide-react';
 
 export const icons = {
@@ -28,4 +29,5 @@ export const icons = {
     moveRight: MoveRight,
     chevronUp: ChevronUp,
     chevronDown: ChevronDown,
+    pencil: Pencil,
 };

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Icon as IconifyIcon } from "@iconify/react";
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
 import { resolveColor } from "@/app/config/chartColors";
+import Icon from "../Icon";
 
 type Transaction = {
     id?: string;
@@ -314,6 +315,10 @@ export default function ShowTransactions({
                                                 }}
                                             >
                                                 {category}
+
+                                                <button >
+                                                    <Icon name="pencil" />
+                                                </button>
                                             </span>
                                         </div>
                                     )}
