@@ -309,7 +309,7 @@ export default function TransactionToolbar({
                         {filterOpen && (
                             <div
                                 className="
-                                    fixed right-0 top-[calc(100%+0.5rem)] z-55 w-full rounded-2xl
+                                    absolute right-0 top-[calc(100%+0.5rem)] z-50 w-screen rounded-2xl
                                     border border-white/10 bg-[#0f172a]/95 shadow-2xl backdrop-blur-lg
                                     lg:w-[720px] max-w-[calc(100vw-2rem)]
                                 "
