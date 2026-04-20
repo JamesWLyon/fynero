@@ -74,6 +74,8 @@ export default function Transactions() {
                         showAccount
                         showAmount
                         showIcon
+                        editCategory
+                        showIncome={filters.showIncome}
                     />
                 </div>
             </Wrapper>

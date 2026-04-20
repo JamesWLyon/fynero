@@ -166,13 +166,16 @@ export default function Transactions() {
                 </div>
 
                 <Card className="w-full">
-                    <TransactionToolbar
-                        transactions={transactions}
-                        exportTransactions={filteredTransactions}
-                        filters={filters}
-                        onChange={setFilters}
+                    <ShowTransactions 
+                        transactions={filteredTransactions}
+                        limit={10}
+                        showDate
+                        pages
+                        showCategory
+                        showAccount
+                        showAmount
+                        showIcon
                     />
-                    <ShowTransactions transactions={filteredTransactions} />
                 </Card>
             </Wrapper>
         </>
