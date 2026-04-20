@@ -5,6 +5,8 @@ import { Icon as IconifyIcon } from "@iconify/react";
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
 import { resolveColor } from "@/app/config/chartColors";
 import Icon from "../Icon";
+import CategoryEditorModal from "./CategoryEditorModal";
+import { getDisplayLabelFromPath } from "@/lib/finance/categoryTree";
 
 type Transaction = {
     id?: string;
@@ -15,6 +17,7 @@ type Transaction = {
     description?: string;
     category?: string | null;
     sub_category?: string | null;
+    category_path?: string | null;
     type?: string | null;
     amount?: number | string | null;
     account?: string | null;
@@ -34,6 +37,8 @@ type ShowTransactionsProps = {
     showAmount?: boolean;
     showIcon?: boolean;
     pages?: boolean;
+    editCategory?: boolean;
+    showIncome?: boolean;
 };
 
 function normalizeText(value: string) {
@@ -59,8 +64,30 @@ function getDisplayName(tx: Transaction) {
     return tx.description || tx.name || "Unknown transaction";
 }
 
-function getDisplayCategory(tx: Transaction) {
-    return tx.sub_category || tx.category || "other";
+function getTransactionPath(tx: Transaction) {
+    if (tx.category_path && tx.category_path.trim()) {
+        return tx.category_path;
+    }
+
+    if (tx.category === "income" || (tx.type || "").toLowerCase() === "income") {
+        return tx.sub_category ? `income.${tx.sub_category}` : "income";
+    }
+
+    if (tx.category === "debt") {
+        return tx.sub_category ? `spent.debt.${tx.sub_category}` : "spent.debt";
+    }
+
+    if (tx.category === "savings") {
+        return tx.sub_category ? `spent.savings.${tx.sub_category}` : "spent.savings";
+    }
+
+    if (tx.category) {
+        return tx.sub_category
+            ? `spent.expenses.${tx.category}.${tx.sub_category}`
+            : `spent.expenses.${tx.category}`;
+    }
+
+    return "spent.expenses.other";
 }
 
 function getDisplayAccount(tx: Transaction) {
@@ -73,6 +100,10 @@ function getDisplayAccount(tx: Transaction) {
 
 function getRawAmount(tx: Transaction) {
     return Number(tx.amount || 0);
+}
+
+function isIncome(tx: Transaction) {
+    return (tx.type || "").toLowerCase() === "income" || tx.category === "income";
 }
 
 function isRefundLike(tx: Transaction) {
@@ -201,15 +232,29 @@ export default function ShowTransactions({
     showAmount = false,
     showIcon = true,
     pages = false,
+    editCategory = false,
+    showIncome = true,
 }: ShowTransactionsProps) {
     const [currentPage, setCurrentPage] = useState(1);
+    const [editingTx, setEditingTx] = useState<{
+        id: string;
+        categoryPath: string;
+    } | null>(null);
+    const [categoryOverrides, setCategoryOverrides] = useState<Record<string, string>>({});
 
     const sortedTransactions = useMemo(() => {
-        return transactions.filter((tx) => {
-            const type = (tx.type || "").toLowerCase();
-            return type !== "income";
+        const filtered = transactions.filter((tx) => {
+            if (!showIncome && isIncome(tx)) return false;
+            return true;
         });
-    }, [transactions]);
+
+        return [...filtered].sort((a, b) => {
+            const aTime = new Date(a.created_at || a.date || 0).getTime();
+            const bTime = new Date(b.created_at || b.date || 0).getTime();
+
+            return newestFirst ? bTime - aTime : aTime - bTime;
+        });
+    }, [transactions, newestFirst, showIncome]);
 
     const safeLimit = Math.max(1, limit);
     const totalPages = pages
@@ -218,7 +263,7 @@ export default function ShowTransactions({
 
     useEffect(() => {
         setCurrentPage(1);
-    }, [transactions, newestFirst, limit, pages]);
+    }, [transactions, newestFirst, limit, pages, showIncome]);
 
     useEffect(() => {
         if (currentPage > totalPages) {
@@ -249,47 +294,50 @@ export default function ShowTransactions({
     return (
         <div className={`w-full max-w-full min-w-0 overflow-x-hidden ${className}`}>
             <div className="w-full min-w-0">
-                {/* Desktop / tablet layout */}
                 <div className="hidden md:block">
                     <div
-                        className="grid gap-3 px-4 py-3 text-sm text-white/70 border-b border-white/10 items-center"
+                        className="grid min-w-0 items-center gap-3 border-b border-white/10 px-4 py-3 text-sm text-white/70"
                         style={{ gridTemplateColumns }}
                     >
                         {showDate && <p className="truncate">Date</p>}
                         <p className="truncate">Name</p>
                         {showCategory && <p className="truncate">Category</p>}
                         {showAccount && <p className="truncate">Account</p>}
-                        {showAmount && <p className="text-right truncate">Amount</p>}
+                        {showAmount && <p className="truncate text-right">Amount</p>}
                     </div>
 
-                    <div className="flex flex-col">
+                    <div className="flex min-w-0 flex-col">
                         {displayedTransactions.map((tx) => {
+                            const txId = tx.id ?? tx.plaid_transaction_id ?? "";
                             const name = getDisplayName(tx);
-                            const category = getDisplayCategory(tx);
+                            const currentPath = categoryOverrides[txId] ?? getTransactionPath(tx);
+                            const category = getDisplayLabelFromPath(currentPath);
                             const account = getDisplayAccount(tx);
                             const rawAmount = getRawAmount(tx);
-                            const refundLike = isRefundLike(tx);
-                            const amountColor = refundLike ? "text-green-400" : "text-red-400";
-                            const amountPrefix = refundLike ? "+" : "-";
-                            const categoryColor = resolveColor(category);
+                            const incomeLike = isIncome(tx);
+                            const refundLike = !incomeLike && isRefundLike(tx);
+                            const positiveAmount = incomeLike || refundLike;
+                            const amountColor = positiveAmount ? "text-green-400" : "text-red-400";
+                            const amountPrefix = positiveAmount ? "+" : "-";
+                            const categoryColor = resolveColor(category.toLowerCase());
                             const categoryBg = hexToRgba(categoryColor, 0.22);
                             const merchantIcon = showIcon ? getMerchantIcon(name) : null;
 
                             return (
                                 <div
                                     key={tx.id || tx.plaid_transaction_id || `${name}-${tx.created_at || tx.date}`}
-                                    className="grid gap-3 px-4 py-4 border-b border-white/10 items-center min-w-0"
+                                    className="grid min-w-0 items-center gap-3 border-b border-white/10 px-4 py-4"
                                     style={{ gridTemplateColumns }}
                                 >
                                     {showDate && (
-                                        <p className="text-white/80 truncate">
+                                        <p className="min-w-0 truncate text-white/80">
                                             {formatDate(tx.created_at || tx.date)}
                                         </p>
                                     )}
 
-                                    <div className="flex items-center gap-3 min-w-0">
+                                    <div className="flex min-w-0 items-center gap-3">
                                         {showIcon && (
-                                            <div className="w-8 h-8 shrink-0 rounded-md bg-white/8 border border-white/10 flex items-center justify-center overflow-hidden">
+                                            <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-md border border-white/10 bg-white/8">
                                                 {merchantIcon ? (
                                                     <IconifyIcon icon={merchantIcon} width={18} height={18} />
                                                 ) : (
@@ -300,37 +348,58 @@ export default function ShowTransactions({
                                             </div>
                                         )}
 
-                                        <p className="text-white font-medium truncate min-w-0">
+                                        <p className="min-w-0 truncate font-medium text-white">
                                             {name}
                                         </p>
                                     </div>
 
                                     {showCategory && (
                                         <div className="min-w-0">
-                                            <span
-                                                className="inline-flex max-w-full items-center rounded-md px-2.5 py-1 text-sm text-white border truncate"
-                                                style={{
-                                                    backgroundColor: categoryBg,
-                                                    borderColor: categoryColor,
-                                                }}
-                                            >
-                                                {category}
-
-                                                <button >
-                                                    <Icon name="pencil" />
+                                            {editCategory ? (
+                                                <button
+                                                    type="button"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        if (!txId) return;
+                                                        setEditingTx({
+                                                            id: txId,
+                                                            categoryPath: currentPath,
+                                                        });
+                                                    }}
+                                                    className="inline-flex max-w-full items-center rounded-md border px-2.5 py-1 text-sm text-white transition-colors hover:brightness-110"
+                                                    style={{
+                                                        backgroundColor: categoryBg,
+                                                        borderColor: categoryColor,
+                                                    }}
+                                                    aria-label={`Edit category ${category}`}
+                                                >
+                                                    <span className="truncate">{category}</span>
+                                                    <span className="ml-2 shrink-0 text-white/50">
+                                                        <Icon name="pencil" />
+                                                    </span>
                                                 </button>
-                                            </span>
+                                            ) : (
+                                                <span
+                                                    className="inline-flex max-w-full items-center rounded-md border px-2.5 py-1 text-sm text-white"
+                                                    style={{
+                                                        backgroundColor: categoryBg,
+                                                        borderColor: categoryColor,
+                                                    }}
+                                                >
+                                                    <span className="truncate">{category}</span>
+                                                </span>
+                                            )}
                                         </div>
                                     )}
 
                                     {showAccount && (
-                                        <p className="text-white/85 truncate min-w-0">
+                                        <p className="min-w-0 truncate text-white/85">
                                             {account}
                                         </p>
                                     )}
 
                                     {showAmount && (
-                                        <p className={`text-right font-medium truncate ${amountColor}`}>
+                                        <p className={`min-w-0 truncate text-right font-medium ${amountColor}`}>
                                             {amountPrefix}${Math.abs(rawAmount).toFixed(2)}
                                         </p>
                                     )}
@@ -346,29 +415,32 @@ export default function ShowTransactions({
                     </div>
                 </div>
 
-                {/* Mobile layout */}
-                <div className="md:hidden overflow-x-hidden">
-                    <div className="flex flex-col">
+                <div className="overflow-x-hidden md:hidden">
+                    <div className="flex min-w-0 flex-col">
                         {displayedTransactions.map((tx) => {
+                            const txId = tx.id ?? tx.plaid_transaction_id ?? "";
                             const name = getDisplayName(tx);
-                            const category = getDisplayCategory(tx);
+                            const currentPath = categoryOverrides[txId] ?? getTransactionPath(tx);
+                            const category = getDisplayLabelFromPath(currentPath);
                             const account = getDisplayAccount(tx);
                             const rawAmount = getRawAmount(tx);
-                            const refundLike = isRefundLike(tx);
-                            const amountColor = refundLike ? "text-green-400" : "text-red-400";
-                            const amountPrefix = refundLike ? "+" : "-";
-                            const categoryColor = resolveColor(category);
+                            const incomeLike = isIncome(tx);
+                            const refundLike = !incomeLike && isRefundLike(tx);
+                            const positiveAmount = incomeLike || refundLike;
+                            const amountColor = positiveAmount ? "text-green-400" : "text-red-400";
+                            const amountPrefix = positiveAmount ? "+" : "-";
+                            const categoryColor = resolveColor(category.toLowerCase());
                             const categoryBg = hexToRgba(categoryColor, 0.22);
                             const merchantIcon = showIcon ? getMerchantIcon(name) : null;
 
                             return (
                                 <div
                                     key={tx.id || tx.plaid_transaction_id || `${name}-${tx.created_at || tx.date}`}
-                                    className="px-4 py-4 border-b border-white/10"
+                                    className="border-b border-white/10 px-4 py-4"
                                 >
-                                    <div className="flex items-start gap-3 min-w-0">
+                                    <div className="flex min-w-0 items-start gap-3">
                                         {showIcon && (
-                                            <div className="w-8 h-8 shrink-0 rounded-md bg-white/8 border border-white/10 flex items-center justify-center overflow-hidden">
+                                            <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-md border border-white/10 bg-white/8">
                                                 {merchantIcon ? (
                                                     <IconifyIcon icon={merchantIcon} width={18} height={18} />
                                                 ) : (
@@ -380,39 +452,63 @@ export default function ShowTransactions({
                                         )}
 
                                         <div className="min-w-0 flex-1">
-                                            <div className="flex items-start gap-3 min-w-0">
-                                                <p className="text-white font-medium truncate min-w-0 flex-1">
+                                            <div className="flex min-w-0 items-start gap-3">
+                                                <p className="min-w-0 flex-1 truncate font-medium text-white">
                                                     {name}
                                                 </p>
 
                                                 {showAmount && (
-                                                    <p className={`shrink-0 text-right font-medium max-w-[30%] truncate ${amountColor}`}>
+                                                    <p className={`max-w-[40%] shrink-0 truncate text-right font-medium ${amountColor}`}>
                                                         {amountPrefix}${Math.abs(rawAmount).toFixed(2)}
                                                     </p>
                                                 )}
                                             </div>
 
-                                            <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-white/70 min-w-0">
+                                            <div className="mt-2 flex min-w-0 flex-wrap items-center gap-2 text-sm text-white/70">
                                                 {showDate && (
-                                                    <span>
+                                                    <span className="shrink-0">
                                                         {formatDate(tx.created_at || tx.date)}
                                                     </span>
                                                 )}
 
-                                                {showCategory && (
-                                                    <span
-                                                        className="inline-flex items-center rounded-md px-2.5 py-1 text-sm text-white border truncate max-w-[160px]"
-                                                        style={{
-                                                            backgroundColor: categoryBg,
-                                                            borderColor: categoryColor,
-                                                        }}
-                                                    >
-                                                        {category}
-                                                    </span>
-                                                )}
+                                                {showCategory &&
+                                                    (editCategory ? (
+                                                        <button
+                                                            type="button"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                if (!txId) return;
+                                                                setEditingTx({
+                                                                    id: txId,
+                                                                    categoryPath: currentPath,
+                                                                });
+                                                            }}
+                                                            className="inline-flex max-w-[200px] items-center rounded-md border px-2.5 py-1 text-sm text-white transition-colors hover:brightness-110"
+                                                            style={{
+                                                                backgroundColor: categoryBg,
+                                                                borderColor: categoryColor,
+                                                            }}
+                                                            aria-label={`Edit category ${category}`}
+                                                        >
+                                                            <span className="truncate">{category}</span>
+                                                            <span className="ml-2 shrink-0 text-white/50">
+                                                                <Icon name="pencil" />
+                                                            </span>
+                                                        </button>
+                                                    ) : (
+                                                        <span
+                                                            className="inline-flex max-w-[200px] items-center rounded-md border px-2.5 py-1 text-sm text-white"
+                                                            style={{
+                                                                backgroundColor: categoryBg,
+                                                                borderColor: categoryColor,
+                                                            }}
+                                                        >
+                                                            <span className="truncate">{category}</span>
+                                                        </span>
+                                                    ))}
 
                                                 {showAccount && (
-                                                    <span className="truncate max-w-full">
+                                                    <span className="min-w-0 max-w-full truncate">
                                                         {account}
                                                     </span>
                                                 )}
@@ -433,21 +529,21 @@ export default function ShowTransactions({
 
                 {pages && totalPages > 1 && (
                     <div className="border-t border-white/10 px-3 py-4 sm:px-4">
-                        <div className="flex flex-col items-center gap-2 min-w-0">
-                            <div className="flex w-full items-center justify-center gap-2 sm:hidden">
+                        <div className="flex min-w-0 flex-col items-center gap-2">
+                            <div className="flex w-full min-w-0 items-center justify-center gap-2 sm:hidden">
                                 <button
                                     type="button"
                                     onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                                     disabled={currentPage === 1}
                                     className="
-                                        inline-flex items-center gap-1 rounded-lg border border-white/10
+                                        inline-flex min-w-0 items-center gap-1 rounded-lg border border-white/10
                                         bg-white/[0.03] px-2.5 py-2 text-sm text-white/80 transition
                                         hover:bg-white/[0.05] hover:text-white sm:px-3
                                         disabled:cursor-not-allowed disabled:opacity-40
                                     "
                                 >
-                                    <ChevronLeft size={16} />
-                                    Previous
+                                    <ChevronLeft size={16} className="shrink-0" />
+                                    <span className="truncate">Previous</span>
                                 </button>
 
                                 <button
@@ -455,18 +551,18 @@ export default function ShowTransactions({
                                     onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                                     disabled={currentPage === totalPages}
                                     className="
-                                        inline-flex items-center gap-1 rounded-lg border border-white/10
+                                        inline-flex min-w-0 items-center gap-1 rounded-lg border border-white/10
                                         bg-white/[0.03] px-2.5 py-2 text-sm text-white/80 transition
                                         hover:bg-white/[0.05] hover:text-white sm:px-3
                                         disabled:cursor-not-allowed disabled:opacity-40
                                     "
                                 >
-                                    Next
-                                    <ChevronRight size={16} />
+                                    <span className="truncate">Next</span>
+                                    <ChevronRight size={16} className="shrink-0" />
                                 </button>
                             </div>
 
-                            <div className="flex flex-wrap items-center justify-center gap-2 min-w-0">
+                            <div className="flex min-w-0 flex-wrap items-center justify-center gap-2">
                                 <div className="hidden sm:flex sm:items-center sm:gap-2">
                                     <button
                                         type="button"
@@ -552,6 +648,20 @@ export default function ShowTransactions({
                             </div>
                         </div>
                     </div>
+                )}
+
+                {editingTx && (
+                    <CategoryEditorModal
+                        transactionId={editingTx.id}
+                        currentCategory={editingTx.categoryPath}
+                        onSave={(newCategoryPath) => {
+                            setCategoryOverrides((prev) => ({
+                                ...prev,
+                                [editingTx.id]: newCategoryPath,
+                            }));
+                        }}
+                        onClose={() => setEditingTx(null)}
+                    />
                 )}
             </div>
         </div>
