@@ -24,7 +24,7 @@ export type TransactionToolbarFilters = {
     newestFirst: boolean;
     minAmount: string;
     maxAmount: string;
-    includeRefunds: boolean;
+    showIncome: boolean;
 };
 
 function normalizeText(value: string) {
@@ -84,9 +84,13 @@ export function isRefundLike(tx: Transaction) {
     ].some((term) => name.includes(term));
 }
 
-export function isSpendingTransaction(tx: Transaction) {
-    const type = (tx.type || "").toLowerCase();
-    return type !== "income";
+export function isIncomeTransaction(tx: Transaction) {
+    return (tx.type || "").toLowerCase() === "income" || tx.category === "income";
+}
+
+function matchesIncomeToggle(tx: Transaction, showIncome: boolean) {
+    if (showIncome) return true;
+    return !isIncomeTransaction(tx);
 }
 
 function matchesSearch(tx: Transaction, search: string) {
@@ -155,11 +159,6 @@ function matchesAmountRange(tx: Transaction, minAmount: string, maxAmount: strin
     return true;
 }
 
-function matchesRefundToggle(tx: Transaction, includeRefunds: boolean) {
-    if (includeRefunds) return true;
-    return !isRefundLike(tx);
-}
-
 export function sortTransactions(
     transactions: Transaction[],
     newestFirst = true
@@ -176,15 +175,13 @@ export function filterTransactions(
     transactions: Transaction[],
     filters: TransactionToolbarFilters
 ) {
-    const spendingOnly = transactions.filter(isSpendingTransaction);
-
-    const filtered = spendingOnly.filter((tx) => {
+    const filtered = transactions.filter((tx) => {
         return (
+            matchesIncomeToggle(tx, filters.showIncome) &&
             matchesSearch(tx, filters.search) &&
             matchesDateRange(tx, filters.startDate, filters.endDate) &&
             matchesCategory(tx, filters.category) &&
             matchesAccount(tx, filters.account) &&
-            matchesRefundToggle(tx, filters.includeRefunds) &&
             matchesAmountRange(tx, filters.minAmount, filters.maxAmount)
         );
     });
@@ -202,6 +199,6 @@ export function getDefaultTransactionToolbarFilters(): TransactionToolbarFilters
         newestFirst: true,
         minAmount: "",
         maxAmount: "",
-        includeRefunds: false,
+        showIncome: true,
     };
 }
