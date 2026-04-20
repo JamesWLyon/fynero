@@ -38,15 +38,15 @@ export const navItems: NavItem[] = [
                 icon: ArrowRightLeft,
             },
             {
-                name: 'budget',
-                label: 'Budget',
-                icon: ChartNoAxesColumn,
-            }, 
-            {
                 name: 'bills',
                 label: 'Bills',
                 icon: ScrollText,
             },
+            {
+                name: 'budget',
+                label: 'Budget',
+                icon: ChartNoAxesColumn,
+            }, 
         ],
     },
     {
