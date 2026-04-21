@@ -11,11 +11,7 @@ import MonthYearDropdown from "@/app/ui/MonthYearDropdown";
 import SimpleBarChart from "@/app/ui/charts/SimpleBarChart";
 
 import { useFinance } from "@/lib/hooks/useFinance";
-import {
-    filterTransactions,
-    getDefaultTransactionToolbarFilters,
-    type TransactionToolbarFilters,
-} from "@/lib/finance/transactionFilters";
+import { filterTransactions, getDefaultTransactionToolbarFilters, type TransactionToolbarFilters } from "@/lib/finance/transactionFilters";
 
 export default function Transactions() {
     const sharedStyle = "gap-6";
