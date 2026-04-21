@@ -133,7 +133,7 @@ export default function Transactions() {
                             </Wrapper>
 
                             <Wrapper className="flex items-center justify-center">
-                                <div className="w-full max-w-[85%] h-[22rem]">
+                                <div className="w-full max-w-[720px] h-[25rem]">
                                     <SimplePieChart data={chartData} />
                                 </div>
                             </Wrapper>
