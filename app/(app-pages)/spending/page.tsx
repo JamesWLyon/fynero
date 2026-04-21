@@ -5,7 +5,6 @@ import { useMemo, useState } from "react";
 import { Title, SubTitle, CardTitle } from "@/app/ui/Titles";
 import Wrapper from "@/app/ui/Wrapper";
 import ShowTransactions from "@/app/ui/transaction-data/TransactionsTable";
-import TransactionToolbar from "@/app/ui/transaction-data/TransactionToolbar";
 import Card from "@/app/ui/Card";
 import SimplePieChart from "@/app/ui/charts/SimplePieChart";
 import MonthYearDropdown from "@/app/ui/MonthYearDropdown";
@@ -21,7 +20,12 @@ import {
 export default function Transactions() {
     const sharedStyle = "gap-6";
 
-    const { transactions, get, loading } = useFinance();
+    const {
+        transactions,
+        get,
+        getExpandedChildChartData,
+        loading,
+    } = useFinance();
 
     const [selectedDate, setSelectedDate] = useState({
         month: new Date().getMonth() + 1,
@@ -29,45 +33,40 @@ export default function Transactions() {
     });
 
     const transactionData = useMemo(() => {
-        const spent = get("spent", "month");
+        const spent = get("spent", selectedDate);
 
         return {
             spent,
         };
-    }, [get]);
-
-    const barData = useMemo(() => [
-        {
-            label: "Income",
-            value: get("income", selectedDate),
-        },
-        {
-            label: "Budget",
-            value: 100,
-        },
-        {
-            label: "Spent",
-            value: get("spent", selectedDate),
-        },
-    ], [get, selectedDate]);
-
-    const chartData = useMemo(() => {
-        const keys = [
-            "spent.savings",
-            "spent.debt",
-            "spent.expenses.bills",
-            "spent.expenses.food",
-            "spent.expenses.shopping",
-            "spent.expenses.transport",
-            "spent.expenses.personal",
-            "spent.expenses.other",
-        ];
-
-        return keys.map((key) => ({
-            label: key.split(".").pop()!,
-            value: get(key, selectedDate),
-        }));
     }, [get, selectedDate]);
+
+    const barData = useMemo(
+        () => [
+            {
+                label: "Income",
+                value: get("income", selectedDate),
+            },
+            {
+                label: "Budget",
+                value: 100,
+            },
+            {
+                label: "Spent",
+                value: get("spent", selectedDate),
+            },
+        ],
+        [get, selectedDate]
+    );
+
+    const pieChartData = useMemo(() => {
+        const data = getExpandedChildChartData("spent", selectedDate);
+
+        console.log("PIE CHART DATA");
+        console.log("selectedDate:", selectedDate);
+        console.log("data:", data);
+
+        return data;
+    }, [getExpandedChildChartData, selectedDate]);
 
     const [filters, setFilters] = useState<TransactionToolbarFilters>(
         getDefaultTransactionToolbarFilters()
@@ -104,12 +103,12 @@ export default function Transactions() {
 
             <Wrapper className={`flex flex-col ${sharedStyle}`}>
                 <div className={`flex flex-col xl:flex-row ${sharedStyle}`}>
-                    <div className={`flex flex-col w-full xl:w-1/2 ${sharedStyle}`}>
-                        <div className={`grid grid-cols-1 md:grid-cols-2 ${sharedStyle}`}>
+                    <div className={`flex w-full flex-col xl:w-1/2 ${sharedStyle}`}>
+                        <div className={`grid grid-cols-1 gap-6 md:grid-cols-2`}>
                             <Card className="w-full">
                                 <CardTitle title="Total Spent" className="text-lg text-secondary/80" />
                                 <p className="text-[2rem]">
-                                    $1000
+                                    ${transactionData.spent}
                                 </p>
                             </Card>
 
@@ -122,11 +121,13 @@ export default function Transactions() {
                         </div>
 
                         <Card className="w-full">
-                            <Wrapper className="
-                                flex flex-col items-center 
-                                justify-center gap-3 sm:flex-row 
-                                sm:gap-0 sm:items-center text-center
-                            ">
+                            <Wrapper
+                                className="
+                                    flex flex-col items-center
+                                    justify-center gap-3 text-center
+                                    sm:flex-row sm:items-center sm:gap-0
+                                "
+                            >
                                 <CardTitle title="Spending Breakdown" className="text-[1.5rem]" />
                                 <MonthYearDropdown
                                     linked
@@ -137,19 +138,21 @@ export default function Transactions() {
                             </Wrapper>
 
                             <Wrapper className="flex items-center justify-center">
-                                <div className="w-full max-w-[720px] h-[25rem]">
-                                    <SimplePieChart data={chartData} />
+                                <div className="h-[25rem] w-full max-w-[720px]">
+                                    <SimplePieChart data={pieChartData} />
                                 </div>
                             </Wrapper>
                         </Card>
                     </div>
 
                     <Card className="w-full flex-1 shrink-0">
-                        <Wrapper className="flex flex-col items-center 
-                            justify-center gap-3 sm:flex-row 
-                            sm:gap-0 sm:items-center text-center 
-                            sm:text-left sm:flex-row mb-12
-                        ">
+                        <Wrapper
+                            className="
+                                mb-12 flex flex-col items-center
+                                justify-center gap-3 text-center
+                                sm:flex-row sm:items-center sm:gap-0 sm:text-left
+                            "
+                        >
                             <div>
                                 <CardTitle title="Avg. Daily Spending" className="text-[1.5rem]" />
                                 <p className="text-[2rem]">
@@ -166,7 +169,7 @@ export default function Transactions() {
                         </Wrapper>
 
                         <Wrapper className="flex items-center justify-center">
-                            <div className="w-full max-w-[80%] h-[28rem]">
+                            <div className="h-[28rem] w-full max-w-[80%]">
                                 <SimpleBarChart data={barData} />
                             </div>
                         </Wrapper>
@@ -174,7 +177,7 @@ export default function Transactions() {
                 </div>
 
                 <Card className="w-full">
-                    <ShowTransactions 
+                    <ShowTransactions
                         transactions={filteredTransactions}
                         limit={10}
                         showDate
