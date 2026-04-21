@@ -258,7 +258,7 @@ export default function TransactionToolbar({
     return (
         <div
             className={[
-                "w-full min-w-0 rounded-2xl backdrop-blur-[0px]",
+                "relative w-full min-w-0 rounded-2xl backdrop-blur-[0px]",
                 "p-3 sm:p-4",
                 className,
             ].join(" ")}
@@ -285,7 +285,7 @@ export default function TransactionToolbar({
                 </div>
 
                 <div className="grid min-w-0 grid-cols-2 gap-3 lg:flex lg:min-w-fit lg:flex-none lg:items-center">
-                    <div ref={filterRef} className="relative min-w-0 lg:w-auto">
+                    <div ref={filterRef} className="min-w-0 xl:relative xl:w-auto">
                         <button
                             type="button"
                             onClick={() => {
@@ -313,9 +313,10 @@ export default function TransactionToolbar({
                         {filterOpen && (
                             <div
                                 className="
-                                    fixed right-0 top-[calc(100%+0.5rem)] z-55 w-full rounded-2xl
-                                    border border-white/10 bg-[#0f172a]/95 shadow-2xl backdrop-blur-lg
-                                    lg:w-[720px] max-w-[calc(100vw-2rem)]
+                                    absolute top-[calc(100%+0.5rem)] left-1/2 z-50
+                                    w-[calc(100%-1.5rem)] max-w-[720px] -translate-x-1/2
+                                    rounded-2xl border border-white/10 bg-[#0f172a]/95 shadow-2xl backdrop-blur-lg
+                                    xl:left-auto xl:right-0 lg:w-[720px] xl:max-w-[min(720px,calc(100vw-2rem))] xl:translate-x-0
                                 "
                             >
                                 <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3">
