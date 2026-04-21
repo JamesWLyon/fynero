@@ -471,6 +471,16 @@ export default function ShowTransactions({
                                                     </span>
                                                 )}
 
+                                                {showDate && showAccount && (
+                                                    <p>/</p>
+                                                )}
+
+                                                {showAccount && (
+                                                    <span className="min-w-0 max-w-full truncate">
+                                                        {account}
+                                                    </span>
+                                                )}
+
                                                 {showCategory &&
                                                     (editCategory ? (
                                                         <button
@@ -506,12 +516,6 @@ export default function ShowTransactions({
                                                             <span className="truncate">{category}</span>
                                                         </span>
                                                     ))}
-
-                                                {showAccount && (
-                                                    <span className="min-w-0 max-w-full truncate">
-                                                        {account}
-                                                    </span>
-                                                )}
                                             </div>
                                         </div>
                                     </div>
