@@ -41,19 +41,17 @@ function Listbox({ value, options, onChange, placeholder }: {
 
     const selectedLabel = options.find((o) => o.value === value)?.label ?? placeholder ?? "";
 
-    // Compute exact width needed: widest label + px-3 both sides (24px) + gap (12px) + checkmark (13px)
     const dropdownWidth = useMemo(() => {
         const widest = options.reduce((max, opt) => {
             const w = measureTextWidth(opt.label);
             return w > max ? w : max;
         }, 0);
-        return Math.ceil(widest) + 24 + 12 + 13 + 24; // left pad + gap + icon + right pad
+        return Math.ceil(widest) + 2 + 12 + 13 + 20;
     }, [options]);
 
-    // Button width: selected label + px-3 both sides + gap (8px) + chevron (14px)
     const buttonWidth = useMemo(() => {
         const w = measureTextWidth(selectedLabel);
-        return Math.ceil(w) + 24 + 8 + 14 + 24;
+        return Math.ceil(w) + 2 + 8 + 14 + 20;
     }, [selectedLabel]);
 
     useEffect(() => {

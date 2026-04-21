@@ -140,13 +140,17 @@ export default function Dashboard() {
 
             <Wrapper className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6">
                 <Card>
-                    <Wrapper className="flex mb-8">
+                    <Wrapper className="
+                        flex flex-col items-center 
+                        justify-center gap-3 sm:flex-row 
+                        sm:gap-0 sm:items-center text-center
+                    ">
                         <CardTitle title="Income vs Expenses" className="text-[2rem]" />
                         <MonthYearDropdown
                             linked
                             value={selectedDate}
                             onChange={setSelectedDate}
-                            className="ml-auto"
+                            className="sm:ml-auto"
                         />
                     </Wrapper>
 
@@ -156,13 +160,17 @@ export default function Dashboard() {
                 </Card>
 
                 <Card>
-                    <Wrapper className="flex">
+                    <Wrapper className="
+                        flex flex-col items-center 
+                        justify-center gap-3 sm:flex-row 
+                        sm:gap-0 sm:items-center text-center
+                    ">
                         <CardTitle title="Spent Breakdown" className="text-[2rem]" />
                         <MonthYearDropdown
                             linked
                             value={selectedDate}
                             onChange={setSelectedDate}
-                            className="ml-auto"
+                            className="sm:ml-auto"
                         />
                     </Wrapper>
 
@@ -174,14 +182,13 @@ export default function Dashboard() {
                 </Card>
 
                 <Card>
-                    <CardTitle title="Recent Transactions" className="text-[2rem] overflow-hidden" />
+                    <CardTitle title="Recent Transactions" className="text-[2rem] text-center sm:text-left mb-4" />
                     <ShowTransactions
                         transactions={transactions}
                         limit={4}
                         showCategory
                         showAmount
                         showIcon
-                        className=""
                     />
 
                     <div className="mt-4 flex justify-end">

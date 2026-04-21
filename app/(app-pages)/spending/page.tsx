@@ -122,13 +122,17 @@ export default function Transactions() {
                         </div>
 
                         <Card className="w-full">
-                            <Wrapper className="flex mb-8">
+                            <Wrapper className="
+                                flex flex-col items-center 
+                                justify-center gap-3 sm:flex-row 
+                                sm:gap-0 sm:items-center text-center
+                            ">
                                 <CardTitle title="Spending Breakdown" className="text-[1.5rem]" />
                                 <MonthYearDropdown
                                     linked
                                     value={selectedDate}
                                     onChange={setSelectedDate}
-                                    className="ml-auto"
+                                    className="sm:ml-auto"
                                 />
                             </Wrapper>
 
@@ -141,7 +145,11 @@ export default function Transactions() {
                     </div>
 
                     <Card className="w-full flex-1 shrink-0">
-                        <Wrapper className="flex mb-12">
+                        <Wrapper className="flex flex-col items-center 
+                            justify-center gap-3 sm:flex-row 
+                            sm:gap-0 sm:items-center text-center 
+                            sm:text-left sm:flex-row mb-12
+                        ">
                             <div>
                                 <CardTitle title="Avg. Daily Spending" className="text-[1.5rem]" />
                                 <p className="text-[2rem]">
@@ -153,7 +161,7 @@ export default function Transactions() {
                                 linked
                                 value={selectedDate}
                                 onChange={setSelectedDate}
-                                className="ml-auto"
+                                className="sm:ml-auto"
                             />
                         </Wrapper>
 
