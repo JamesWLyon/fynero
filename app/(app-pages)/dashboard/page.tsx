@@ -141,7 +141,7 @@ export default function Dashboard() {
             <Wrapper className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6">
                 <Card>
                     <Wrapper className="
-                        flex flex-col items-center 
+                        flex flex-col items-center mb-7
                         justify-center gap-3 sm:flex-row 
                         sm:gap-0 sm:items-center text-center
                     ">
