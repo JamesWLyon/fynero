@@ -27,11 +27,11 @@ export default function PagesLayout({
     <div className="flex min-h-screen">
       <Navbar />
 
-      <main className="flex-1">
+      <main className="flex-1 min-w-0">
         <BackgroundWrapper variant="secondary" />
 
         {/* pt-16 on mobile gives room for the hamburger button, removed on md+ */}
-        <div className="p-6 pt-16 md:pt-6 relative z-10">
+        <div className="relative p-6 pt-16 md:pt-6 relative z-10">
           {children}
         </div>
       </main>
