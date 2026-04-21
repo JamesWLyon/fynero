@@ -142,10 +142,11 @@ export default function Dashboard() {
             <Wrapper className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6">
                 <Card>
                     <Wrapper className="
-                        flex flex-col items-center mb-7
-                        justify-center gap-3 sm:flex-row 
-                        sm:gap-0 sm:items-center text-center
-                    ">
+                            flex flex-col items-center mb-7
+                            justify-center gap-3 sm:flex-row 
+                            sm:gap-0 sm:items-center text-center
+                        "
+                    >
                         <CardTitle title="Income vs Expenses" className="text-[2rem]" />
                         <MonthYearDropdown
                             linked
@@ -162,10 +163,11 @@ export default function Dashboard() {
 
                 <Card>
                     <Wrapper className="
-                        flex flex-col items-center 
-                        justify-center gap-3 sm:flex-row 
-                        sm:gap-0 sm:items-center text-center
-                    ">
+                            flex flex-col items-center 
+                            justify-center gap-3 sm:flex-row 
+                            sm:gap-0 sm:items-center text-center
+                        "
+                    >
                         <CardTitle title="Spending Breakdown" className="text-[2rem]" />
                         <MonthYearDropdown
                             linked

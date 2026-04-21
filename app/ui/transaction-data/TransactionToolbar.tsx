@@ -293,9 +293,10 @@ export default function TransactionToolbar({
                                 setExportOpen(false);
                             }}
                             className="
-                                inline-flex w-full min-w-0 items-center justify-center gap-2 rounded-xl border border-white/10
+                                inline-flex w-full min-w-0 items-center justify-center 
+                                gap-2 rounded-xl border border-white/10
                                 bg-white/[0.03] px-4 py-3 text-white transition
-                                hover:bg-white/[0.05] lg:w-auto
+                                hover:bg-white/[0.05] lg:w-auto hover:cursor-pointer
                             "
                         >
                             <Filter size={16} className="shrink-0" />
@@ -420,7 +421,6 @@ export default function TransactionToolbar({
                                             onChange={(v) =>
                                                 updateFilter("newestFirst", v === "newest")
                                             }
-                                            placeholder="Select order"
                                         />
                                     </div>
 
@@ -436,9 +436,10 @@ export default function TransactionToolbar({
                                             }
                                             aria-pressed={filters.showIncome}
                                             className="
-                                                flex w-full min-w-0 items-center justify-between gap-3 rounded-xl border border-white/10
+                                                flex w-full min-w-0 items-center justify-between gap-3 
+                                                rounded-xl border border-white/10
                                                 bg-white/[0.03] px-4 py-3 text-white transition
-                                                hover:bg-white/[0.05]
+                                                hover:bg-white/[0.05] hover:cursor-pointer
                                             "
                                         >
                                             <span className="min-w-0 truncate text-sm sm:text-base">
@@ -523,9 +524,11 @@ export default function TransactionToolbar({
                                 setFilterOpen(false);
                             }}
                             className="
-                                inline-flex w-full min-w-0 items-center justify-center gap-2 rounded-xl border border-white/10
+                                inline-flex w-full min-w-0 items-center justify-center 
+                                gap-2 rounded-xl border border-white/10
                                 bg-white/[0.03] px-4 py-3 text-white transition
                                 hover:bg-white/[0.05] lg:w-auto
+                                hover:cursor-pointer
                             "
                         >
                             <Download size={16} className="shrink-0" />
@@ -537,11 +540,20 @@ export default function TransactionToolbar({
                         </button>
 
                         {exportOpen && (
-                            <div className="absolute left-0 top-[calc(100%+0.5rem)] z-30 min-w-full overflow-hidden rounded-xl border border-white/10 bg-[#0f172a]/95 shadow-2xl backdrop-blur-lg">
+                            <div className="
+                                    absolute left-0 top-[calc(100%+0.5rem)] z-30 min-w-full
+                                    overflow-hidden rounded-xl border border-white/10 
+                                    bg-[#0f172a]/95 shadow-2xl backdrop-blur-lg
+                                "
+                            >
                                 <button
                                     type="button"
                                     onClick={handleExportCsv}
-                                    className="flex w-full items-center gap-2 px-4 py-3 text-left text-white/85 transition hover:bg-white/[0.06] hover:text-white"
+                                    className="
+                                        flex w-full items-center gap-2 px-4 py-3 
+                                        text-left text-white/85 transition hover:bg-white/[0.06] 
+                                        hover:text-white hover:cursor-pointer
+                                    "
                                 >
                                     <Download size={16} className="shrink-0" />
                                     <span className="truncate">Export CSV</span>
@@ -550,7 +562,11 @@ export default function TransactionToolbar({
                                 <button
                                     type="button"
                                     onClick={handleExportPdf}
-                                    className="flex w-full items-center gap-2 border-t border-white/10 px-4 py-3 text-left text-white/85 transition hover:bg-white/[0.06] hover:text-white"
+                                    className="
+                                        flex w-full items-center gap-2 border-t border-white/10
+                                        px-4 py-3 text-left text-white/85 transition 
+                                        hover:bg-white/[0.06] hover:text-white hover:cursor-pointer
+                                    "
                                 >
                                     <Download size={16} className="shrink-0" />
                                     <span className="truncate">Export PDF</span>

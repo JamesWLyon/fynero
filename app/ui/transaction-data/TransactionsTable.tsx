@@ -366,7 +366,12 @@ export default function ShowTransactions({
                                                             categoryPath: currentPath,
                                                         });
                                                     }}
-                                                    className="inline-flex max-w-full items-center rounded-md border px-2.5 py-1 text-sm text-white transition-colors hover:brightness-110"
+                                                    className="
+                                                        inline-flex max-w-full items-center 
+                                                        rounded-md border px-2.5 py-1 text-sm 
+                                                        text-white transition-colors hover:brightness-110
+                                                        hover:cursor-pointer
+                                                    "
                                                     style={{
                                                         backgroundColor: categoryBg,
                                                         borderColor: categoryColor,
