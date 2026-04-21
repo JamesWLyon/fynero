@@ -15,6 +15,7 @@ import SimplePieChart from "@/app/ui/charts/SimplePieChart";
 import AutoSync from "@/app/ui/plaid/AutoSync";
 import TotalBalance from "@/app/ui/plaid/TotalBalance";
 import ShowTransactions from "@/app/ui/transaction-data/TransactionsTable";
+import ViewMore from "@/app/ui/ViewMore";
 
 import { useFinance } from "@/lib/hooks/useFinance";
 
@@ -165,7 +166,7 @@ export default function Dashboard() {
                         justify-center gap-3 sm:flex-row 
                         sm:gap-0 sm:items-center text-center
                     ">
-                        <CardTitle title="Spent Breakdown" className="text-[2rem]" />
+                        <CardTitle title="Spending Breakdown" className="text-[2rem]" />
                         <MonthYearDropdown
                             linked
                             value={selectedDate}
@@ -179,6 +180,8 @@ export default function Dashboard() {
                             <SimplePieChart data={pieChartData} />
                         </div>
                     </Wrapper>
+
+                    <ViewMore content="See More" href="spending" />
                 </Card>
 
                 <Card>
@@ -191,18 +194,7 @@ export default function Dashboard() {
                         showIcon
                     />
 
-                    <div className="mt-4 flex justify-end">
-                        <Link
-                            href="/transactions"
-                            className="
-                                inline-flex items-center rounded-xl border border-white/10
-                                bg-white/[0.03] px-4 py-2 text-sm text-white/80 transition
-                                hover:bg-white/[0.05] hover:text-white
-                            "
-                        >
-                            View All
-                        </Link>
-                    </div>
+                    <ViewMore content="View All" href="transactions" />
                 </Card>
 
                 <Card>
