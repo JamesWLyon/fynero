@@ -31,10 +31,7 @@ export function useFinance() {
         async function load() {
             const supabase = createClient();
 
-            const [
-                transactionsResult,
-                authResult,
-            ] = await Promise.all([
+            const [transactionsResult, authResult] = await Promise.all([
                 supabase.from("transactions").select("*"),
                 supabase.auth.getUser(),
             ]);
@@ -110,6 +107,30 @@ export function useFinance() {
         }));
     }, [tree, get]);
 
+    const getExpandedChildChartData = useCallback((
+        parentPath: string,
+        time?: TimeFilter
+    ): ChildChartEntry[] => {
+        const directChildren = getChildrenOfPath(tree, parentPath);
+
+        const expandedNodes = directChildren.flatMap((node) => {
+            if (node.children.length > 0) {
+                return node.children;
+            }
+
+            return [node];
+        });
+
+        return expandedNodes
+        .map((node) => ({
+            label: node.label,
+            value: get(node.path, time),
+            colorKey: node.path.split(".").pop()?.toLowerCase(),
+            path: node.path,
+        }))
+        .filter((item) => item.value > 0);
+    }, [tree, get]);
+
     const getNodeChartData = useCallback((
         paths: string[],
         time?: TimeFilter
@@ -132,6 +153,7 @@ export function useFinance() {
         getChildNodes,
         getChildPaths,
         getChildChartData,
+        getExpandedChildChartData,
         getNodeChartData,
     };
 }
