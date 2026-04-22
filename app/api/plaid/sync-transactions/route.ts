@@ -66,7 +66,7 @@ function mapCategoryFields(path: string[]) {
     };
 }
 
-export async function POST() {
+export async function POST() { 
     try {
         const supabase = await createClient();
 
