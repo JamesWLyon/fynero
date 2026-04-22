@@ -17,15 +17,19 @@ function UsernameStatus({ status }: { status: AvailabilityStatus }) {
   if (status === "idle") return null;
 
   const map: Record<AvailabilityStatus, { text: string; className: string }> = {
-    idle:      { text: "",                              className: "" },
-    checking:  { text: "Checking...",                  className: "text-gray-400" },
-    available: { text: "✓ Username available",         className: "text-green-600" },
-    taken:     { text: "✗ Username already taken",     className: "text-red-500" },
-    invalid:   { text: "3–30 chars, letters/numbers/_", className: "text-gray-400" },
+    idle: { text: "", className: "" },
+    checking: { text: "Checking...", className: "text-gray-400" },
+    available: { text: "✓ Username available", className: "text-green-600" },
+    taken: { text: "✗ Username already taken", className: "text-red-500" },
+    invalid: { text: "3–30 chars, letters/numbers/_", className: "text-gray-400" },
   };
 
   const { text, className } = map[status];
   return <p className={`text-sm mt-1 font-medium ${className}`}>{text}</p>;
+}
+
+function normalizeUsername(username: string) {
+  return username.trim().toLowerCase();
 }
 
 // Main component
@@ -42,7 +46,7 @@ export default function AuthForm({ formType }: { formType?: string }) {
   const config = {
     login: {
       title: "Login",
-      showIdentifier: true, // email OR username field
+      showIdentifier: true,
       showEmail: false,
       showUsername: false,
       showPassword: true,
@@ -94,17 +98,20 @@ export default function AuthForm({ formType }: { formType?: string }) {
     },
   } as const;
 
-  const cfg =
-    config[formType as keyof typeof config] ?? config.login;
+  const cfg = config[formType as keyof typeof config] ?? config.login;
 
   // Username availability: debounced check
   useEffect(() => {
-    if (!username) {
+    if (!cfg.showUsername) return;
+
+    const normalized = normalizeUsername(username);
+
+    if (!normalized) {
       setUsernameStatus("idle");
       return;
     }
 
-    const isValidFormat = /^[a-zA-Z0-9_]{3,30}$/.test(username);
+    const isValidFormat = /^[a-z0-9_]{3,30}$/.test(normalized);
     if (!isValidFormat) {
       setUsernameStatus("invalid");
       return;
@@ -113,15 +120,16 @@ export default function AuthForm({ formType }: { formType?: string }) {
     setUsernameStatus("checking");
 
     if (debounceRef.current) clearTimeout(debounceRef.current);
+
     debounceRef.current = setTimeout(async () => {
-      const available = await isUsernameAvailable(username);
+      const available = await isUsernameAvailable(normalized);
       setUsernameStatus(available ? "available" : "taken");
     }, 500);
 
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [username]);
+  }, [username, cfg.showUsername]);
 
   // Form submit
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -129,26 +137,26 @@ export default function AuthForm({ formType }: { formType?: string }) {
     setError(null);
 
     const formData = new FormData(e.currentTarget);
-    const identifier    = String(formData.get("identifier")     || "");
-    const email         = String(formData.get("email")          || "");
-    const password      = String(formData.get("password")       || "");
+    const identifier = String(formData.get("identifier") || "").trim();
+    const email = String(formData.get("email") || "").trim();
+    const password = String(formData.get("password") || "");
     const confirmPassword = String(formData.get("confirmPassword") || "");
 
     const supabase = createClient();
 
     // Login
     if (formType === "login") {
-      // Detect if identifier is an email or username
       const isEmail = identifier.includes("@");
       let resolvedEmail = identifier;
 
       if (!isEmail) {
-        // Resolve username → email
         const found = await resolveUsernameToEmail(identifier);
+
         if (!found) {
           setError("No account found with that username.");
           return;
         }
+
         resolvedEmail = found;
       }
 
@@ -157,14 +165,27 @@ export default function AuthForm({ formType }: { formType?: string }) {
         password,
       });
 
-      if (error) { setError(error.message); return; }
+      if (error) {
+        setError(error.message);
+        return;
+      }
+
       router.push("/dashboard");
       router.refresh();
+      return;
+    }
 
     // Sign up
-    } else if (formType === "signup") {
+    if (formType === "signup") {
+      const normalizedUsername = normalizeUsername(username);
+
       if (password !== confirmPassword) {
         setError("Passwords do not match.");
+        return;
+      }
+
+      if (!/^[a-z0-9_]{3,30}$/.test(normalizedUsername)) {
+        setError("Username must be 3–30 characters and only contain letters, numbers, or underscores.");
         return;
       }
 
@@ -173,16 +194,18 @@ export default function AuthForm({ formType }: { formType?: string }) {
         return;
       }
 
-      // Pass username in metadata — the DB trigger picks it up
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: { username },
+          data: { username: normalizedUsername },
         },
       });
 
-      if (error) { setError(error.message); return; }
+      if (error) {
+        setError(error.message);
+        return;
+      }
 
       if (data.user && data.user.identities && data.user.identities.length === 0) {
         setError("An account with this email already exists.");
@@ -190,32 +213,44 @@ export default function AuthForm({ formType }: { formType?: string }) {
       }
 
       setShowConfirm(true);
+      return;
+    }
 
     // Forgot password
-    } else if (formType === "forgotPassword") {
+    if (formType === "forgotPassword") {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: "https://fynero.vercel.app/reset-password",
       });
 
-      if (error) { setError(error.message); return; }
+      if (error) {
+        setError(error.message);
+        return;
+      }
+
       setError("Check your email for a reset link.");
+      return;
+    }
 
     // Reset password
-    } else if (formType === "resetPassword") {
+    if (formType === "resetPassword") {
       if (password !== confirmPassword) {
         setError("Passwords do not match.");
         return;
       }
 
       const { error } = await supabase.auth.updateUser({ password });
-      if (error) { setError(error.message); return; }
+
+      if (error) {
+        setError(error.message);
+        return;
+      }
+
       router.push("/login");
     }
   }
 
   return (
     <AuthPageWrapper>
-      {/* Confirmation modal */}
       {showConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
           <div className="bg-white rounded-xl p-8 max-w-sm w-full text-center shadow-xl">
@@ -236,14 +271,13 @@ export default function AuthForm({ formType }: { formType?: string }) {
       )}
 
       <BackgroundWrapper variant="primary" />
+
       <Card className="max-w-[500px]">
         <Title title={cfg.title} />
-        {error && (
-          <p className="text-md font-bold mt-2 text-alert">{error}</p>
-        )}
+
+        {error && <p className="text-md font-bold mt-2 text-alert">{error}</p>}
 
         <form onSubmit={handleSubmit}>
-          {/* Login: single email-or-username field */}
           {cfg.showIdentifier && (
             <input
               name="identifier"
@@ -255,7 +289,6 @@ export default function AuthForm({ formType }: { formType?: string }) {
             />
           )}
 
-          {/* Sign Up: separate email field */}
           {cfg.showEmail && (
             <input
               name="email"
@@ -266,7 +299,6 @@ export default function AuthForm({ formType }: { formType?: string }) {
             />
           )}
 
-          {/* Sign Up: username field with live availability */}
           {cfg.showUsername && (
             <div className="mt-4">
               <input

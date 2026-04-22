@@ -3,17 +3,16 @@ import { createClient } from "@/lib/supabase/client";
 // Types
 export interface Profile {
   id: string;
-  email: string;      // only visible to the owning user (RLS protected)
-  username: string;   // publicly visible
+  email: string;
+  username: string;
   created_at: string;
   updated_at: string;
-  // Future columns — add here + in the DB:
   // display_name?: string;
   // avatar_url?: string;
   // bio?: string;
 }
 
-// Public-safe subset — what anyone can see (no email)
+// Public-safe subset
 export interface PublicProfile {
   id: string;
   username: string;
@@ -23,16 +22,22 @@ export type ProfileResult =
   | { data: Profile; error: null }
   | { data: null; error: string };
 
+function normalizeUsername(username: string) {
+  return username.trim().toLowerCase();
+}
+
 // Helper: resolve username → user id
 export async function resolveUsernameToId(
   username: string
 ): Promise<string | null> {
   const supabase = createClient();
+  const normalizedUsername = normalizeUsername(username);
+
   const { data, error } = await supabase
-    .from("profiles_public")   // public view — only id + username
+    .from("profiles_public")
     .select("id")
-    .eq("username", username)
-    .single();
+    .ilike("username", normalizedUsername)
+    .maybeSingle();
 
   if (error || !data) return null;
   return data.id;
@@ -43,15 +48,11 @@ export async function resolveUsernameToEmail(
   username: string
 ): Promise<string | null> {
   const supabase = createClient();
-  // Resolve id from public view first
-  const id = await resolveUsernameToId(username);
-  if (!id) return null;
+  const normalizedUsername = normalizeUsername(username);
 
-  // Now fetch the email — only works if auth.uid() === id (RLS enforced)
-  // At login time the user isn't authed yet, so we use a Postgres function
-  // that runs as security definer to safely return only their own email.
-  const { data, error } = await supabase
-    .rpc("get_email_by_username", { p_username: username });
+  const { data, error } = await supabase.rpc("get_email_by_username", {
+    p_username: normalizedUsername,
+  });
 
   if (error || !data) return null;
   return data as string;
@@ -59,14 +60,18 @@ export async function resolveUsernameToEmail(
 
 // Helper: check username availability
 export async function isUsernameAvailable(username: string): Promise<boolean> {
-  if (!username || username.length < 3) return false;
+  const normalizedUsername = normalizeUsername(username);
+
+  if (!normalizedUsername || normalizedUsername.length < 3) return false;
+
   const supabase = createClient();
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("profiles_public")
     .select("id")
-    .ilike("username", username)
+    .ilike("username", normalizedUsername)
     .maybeSingle();
 
+  if (error) return false;
   return data === null;
 }
 
@@ -76,11 +81,9 @@ export async function getUserProfile(
   const supabase = createClient();
 
   try {
-    // Always query the full profiles table — RLS enforces ownership
     let query = supabase.from("profiles").select("*");
 
     if (!identifier) {
-      // No arg → current session user
       const {
         data: { user },
         error: authError,
@@ -91,15 +94,15 @@ export async function getUserProfile(
       }
 
       query = query.eq("id", user.id);
-
     } else if (identifier.startsWith("@")) {
-      // @username → resolve to id first via public view, then fetch full profile
       const id = await resolveUsernameToId(identifier.slice(1));
-      if (!id) return { data: null, error: "Username not found." };
-      query = query.eq("id", id);
 
+      if (!id) {
+        return { data: null, error: "Username not found." };
+      }
+
+      query = query.eq("id", id);
     } else {
-      // UUID
       query = query.eq("id", identifier);
     }
 
@@ -118,7 +121,6 @@ export async function getUserProfile(
   }
 }
 
-// updateUserProfile
 export async function updateUserProfile(
   updates: Partial<Omit<Profile, "id" | "created_at" | "updated_at">>
 ): Promise<ProfileResult> {
@@ -133,17 +135,33 @@ export async function updateUserProfile(
     return { data: null, error: "No authenticated user found." };
   }
 
-  // If updating username, check availability first
-  if (updates.username) {
-    const available = await isUsernameAvailable(updates.username);
-    if (!available) {
-      return { data: null, error: "Username is already taken." };
+  const normalizedUpdates = { ...updates };
+
+  if (normalizedUpdates.username) {
+    normalizedUpdates.username = normalizeUsername(normalizedUpdates.username);
+
+    const { data: currentProfile } = await supabase
+      .from("profiles")
+      .select("username")
+      .eq("id", user.id)
+      .single();
+
+    const currentUsername = currentProfile?.username
+      ? normalizeUsername(currentProfile.username)
+      : null;
+
+    if (normalizedUpdates.username !== currentUsername) {
+      const available = await isUsernameAvailable(normalizedUpdates.username);
+
+      if (!available) {
+        return { data: null, error: "Username is already taken." };
+      }
     }
   }
 
   const { data, error } = await supabase
     .from("profiles")
-    .update(updates)
+    .update(normalizedUpdates)
     .eq("id", user.id)
     .select()
     .single();
